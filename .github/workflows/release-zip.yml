@@ -1,0 +1,137 @@
+name: release-zip
+
+# Portable zip release (optional): publishes the self-contained folder build (the same one the
+# README tells people to run), signs Nectar.exe with the developer's own Authenticode certificate
+# from a PFX secret, packs the folder, and attaches the zip plus its SHA-256 to the tagged release.
+# No cloud signing service is involved; the certificate is yours.
+#
+# Required secrets: BASE64_PFX, PFX_PASSWORD  (see docs/SIGNING.md)
+"on":
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to stamp, e.g. 2.0.1'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: zip-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish-and-sign:
+    name: Publish, sign and attach the zip
+    runs-on: windows-latest
+    env:
+      DOTNET_VERSION: 8.0.x
+
+    steps:
+      - name: Check out the tagged commit
+        uses: actions/checkout@v4
+
+      - name: Resolve the version
+        id: v
+        shell: pwsh
+        run: |
+          if ('${{ github.event_name }}' -eq 'workflow_dispatch') {
+            $version = '${{ inputs.version }}'
+          } else {
+            $version = '${{ github.ref_name }}'.TrimStart('v')
+          }
+          if ($version -notmatch '^\d+\.\d+\.\d+$') {
+            throw "Version '$version' must look like MAJOR.MINOR.PATCH."
+          }
+          "version=$version" >> $env:GITHUB_OUTPUT
+          Write-Host "Releasing Nectar $version as a signed zip"
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      # The publish profile is the contract: self-contained win-x64, folder output, no trim, no
+      # single file. Changing it here would silently produce a build the README cannot run.
+      - name: Publish
+        shell: pwsh
+        run: |
+          dotnet publish Nectar/Nectar.csproj -c Release -p:PublishProfile=win-x64
+          if ($LASTEXITCODE -ne 0) { throw "publish failed with $LASTEXITCODE" }
+
+          $exe = 'Nectar/bin/publish/win-x64/Nectar.exe'
+          if (-not (Test-Path $exe)) { throw "Publish did not produce $exe" }
+          Write-Host "Published $((Get-Item $exe).Length) bytes of Nectar.exe"
+
+      - name: Decode the signing certificate
+        shell: pwsh
+        env:
+          BASE64_PFX: ${{ secrets.BASE64_PFX }}
+          PFX_PASSWORD: ${{ secrets.PFX_PASSWORD }}
+        run: |
+          if (-not $env:BASE64_PFX) { throw 'Secret BASE64_PFX is missing or empty.' }
+          if (-not $env:PFX_PASSWORD) { throw 'Secret PFX_PASSWORD is missing or empty.' }
+
+          $pfx = Join-Path $env:RUNNER_TEMP 'signing.pfx'
+          [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String($env:BASE64_PFX))
+          "pfx=$pfx" >> $env:GITHUB_OUTPUT
+        id: cert
+
+      # Reuse the same signing script developers run locally, so CI and a local dry run cannot
+      # drift apart. It signs SHA-256, timestamps against DigiCert, verifies, then zips.
+      - name: Sign the exe and pack the zip
+        shell: pwsh
+        env:
+          PFX_PASSWORD: ${{ secrets.PFX_PASSWORD }}
+        run: |
+          $secure = ConvertTo-SecureString $env:PFX_PASSWORD -AsPlainText -Force
+
+          ./scripts/sign-release.ps1 `
+            -PfxPath '${{ steps.cert.outputs.pfx }}' `
+            -PfxPassword $secure `
+            -Version '${{ steps.v.outputs.version }}' `
+            -Zip
+          if ($LASTEXITCODE -ne 0) { throw "sign-release.ps1 failed with $LASTEXITCODE" }
+
+          $zip = "dist/Nectar-${{ steps.v.outputs.version }}-win-x64.zip"
+          if (-not (Test-Path $zip)) { throw "Expected $zip to exist" }
+
+          # A sidecar hash is what lets a user verify the download without opening PowerShell.
+          $hash = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLower()
+          $name = Split-Path $zip -Leaf
+          [IO.File]::WriteAllText("$zip.sha256", "$hash  $name`n", [Text.UTF8Encoding]::new($false))
+          Write-Host "SHA256: $hash"
+
+      - name: Attach the zip and its hash to the release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.v.outputs.version }}
+          # No name/body here on purpose: this is the only release workflow, and leaving them out
+          # keeps a re-run from overwriting notes edited by hand.
+          files: |
+            dist/Nectar-${{ steps.v.outputs.version }}-win-x64.zip
+            dist/Nectar-${{ steps.v.outputs.version }}-win-x64.zip.sha256
+
+      # `if: always()` matters: without it a failed build or a cancelled run leaves the decoded PFX
+      # on the runner. Runners are ephemeral, but a retried job can reuse the workspace, and
+      # anything uploaded as an artefact afterwards must not be able to pick the key up.
+      - name: Delete the signing key from the runner
+        if: always()
+        shell: pwsh
+        run: |
+          $pfx = Join-Path $env:RUNNER_TEMP 'signing.pfx'
+          if (Test-Path $pfx) {
+            Remove-Item $pfx -Force
+            Write-Host "Deleted $pfx"
+          }
+
+          # Sweep any copy a script or profiler may have left behind.
+          Get-ChildItem -Path $env:RUNNER_TEMP, $env:GITHUB_WORKSPACE -Filter *.pfx -Recurse -ErrorAction SilentlyContinue |
+            Remove-Item -Force -ErrorAction SilentlyContinue
+
+          if (Test-Path $pfx) { throw 'The signing key survived cleanup; investigate before shipping.' }
+          Write-Host 'No PFX remains on the runner.'

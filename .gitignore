@@ -1,0 +1,31 @@
+# Build output
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+# Project-local .NET SDK (installed for compilation, not source)
+.dotnet/
+dotnet-install.ps1
+.dotnet-install.log
+
+# Signing material: never commit a private key or its certificate export
+*.pfx
+*.cer
+*.pvk
+
+# Generated release artifacts (signed zips, hashes)
+dist/
+TestResults/
+
+# Tooling state and local attachments, never source
+.freebuff/
+.cloud-attachments/
+
+# Local databases / logs
+*.db
+*.db-shm
+*.db-wal
+*.log
+.dotnet/

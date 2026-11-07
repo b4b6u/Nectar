@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "lib": ["ES2022", "DOM"],
+    "outDir": ".test-build",
+    "rootDir": ".",
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "noEmitOnError": true,
+    "types": ["node"]
+  },
+  "include": [
+    "lib/appinstaller.ts",
+    "lib/feedGuard.ts",
+    "app/api/download/appinstaller/route.ts"
+  ]
+}

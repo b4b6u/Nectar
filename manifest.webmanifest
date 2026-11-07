@@ -1,0 +1,16 @@
+{
+  "name": "Nectar — the notch that holds your day",
+  "short_name": "Nectar",
+  "description": "A top-edge overlay for Windows: tasks, a focus timer, a scratchpad and today's calendar, local-first and account-free.",
+  "lang": "en",
+  "start_url": "/",
+  "scope": "/",
+  "display": "browser",
+  "theme_color": "#08080a",
+  "background_color": "#08080a",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

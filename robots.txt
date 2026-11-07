@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# SITE_URL: replace the host below with your own domain (same value as index.html).
+Sitemap: https://nectar.vercel.app/sitemap.xml

@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+/* The soft orange bloom behind the notch, same trick as the app's bezel light. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: -20vh 0 auto 0;
+  height: 70vh;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(60% 100% at 50% 0%, rgba(247, 154, 99, 0.16), transparent 70%),
+    radial-gradient(40% 80% at 80% 0%, rgba(163, 156, 208, 0.12), transparent 70%);
+}
+
+::selection {
+  background: #f79a63;
+  color: #201109;
+}
+
+:focus-visible {
+  outline: 2px solid #f79a63;
+  outline-offset: 3px;
+  border-radius: 4px;
+}

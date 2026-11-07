@@ -1,0 +1,439 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- ==========================================================================
+         Shell: near-black rounded container anchored to the top edge.
+         ========================================================================== -->
+    <SolidColorBrush x:Key="NectarShellBrush" Color="#FF000000" />
+    <SolidColorBrush x:Key="NectarShellTextBrush" Color="#F2FFFFFF" />
+    <SolidColorBrush x:Key="NectarShellTextMutedBrush" Color="#7AFFFFFF" />
+    <SolidColorBrush x:Key="NectarHoverBrush" Color="#1AFFFFFF" />
+
+    <!-- ==========================================================================
+         Cards: muted pastel surfaces, one per workspace lane.
+         ========================================================================== -->
+    <SolidColorBrush x:Key="NectarMintCardBrush" Color="#FF8DBA98" />
+    <SolidColorBrush x:Key="NectarLilacCardBrush" Color="#FFA39CD0" />
+    <SolidColorBrush x:Key="NectarButterCardBrush" Color="#FFD2CA72" />
+    <SolidColorBrush x:Key="NectarSkyCardBrush" Color="#FF8CB1CD" />
+
+    <!-- Fine paper grain, tiled across each card at low opacity. -->
+    <ImageBrush
+        x:Key="NectarPaperGrainBrush"
+        ImageSource="ms-appx:///Assets/card-grain.png"
+        Stretch="UniformToFill" />
+
+    <SolidColorBrush x:Key="NectarInkBrush" Color="#F21B241C" />
+    <SolidColorBrush x:Key="NectarInkMutedBrush" Color="#8A1B241C" />
+    <SolidColorBrush x:Key="NectarInkFaintBrush" Color="#591B241C" />
+    <SolidColorBrush x:Key="NectarRowBrush" Color="#8CFFFFFF" />
+    <SolidColorBrush x:Key="NectarRowStrokeBrush" Color="#33FFFFFF" />
+    <SolidColorBrush x:Key="NectarChipBrush" Color="#66FFFFFF" />
+    <SolidColorBrush x:Key="NectarChipActiveBrush" Color="#E6FFFFFF" />
+
+    <LinearGradientBrush x:Key="NectarBrandBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#BDF3D3" Offset="0" />
+        <GradientStop Color="#5FC189" Offset="1" />
+    </LinearGradientBrush>
+
+    <SolidColorBrush x:Key="NectarDeepGreenBrush" Color="#2E6B4A" />
+    <SolidColorBrush x:Key="NectarChartBarBrush" Color="#E6232530" />
+    <SolidColorBrush x:Key="NectarChartCompletedBrush" Color="#FF1A1A1A" />
+    <SolidColorBrush x:Key="NectarChartPlannedBrush" Color="#33000000" />
+    <SolidColorBrush x:Key="NectarChartGridBrush" Color="#1A000000" />
+    <SolidColorBrush x:Key="NectarPillTrackBrush" Color="#26000000" />
+    <SolidColorBrush x:Key="NectarDeepGreenSoftBrush" Color="#2E2E6B4A" />
+    <SolidColorBrush x:Key="NectarDangerBrush" Color="#F0A0A8" />
+    <SolidColorBrush x:Key="NectarTransparentBrush" Color="Transparent" />
+
+    <!-- ==========================================================================
+         Typography
+         ========================================================================== -->
+    <Style x:Key="CardTitleTextStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Segoe UI Variable Text" />
+        <Setter Property="FontSize" Value="13.5" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{StaticResource NectarInkBrush}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <Style x:Key="CardMetaTextStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Segoe UI Variable Text" />
+        <Setter Property="FontSize" Value="9.5" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="CharacterSpacing" Value="120" />
+        <Setter Property="Foreground" Value="{StaticResource NectarInkMutedBrush}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <Style x:Key="CardBodyTextStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Segoe UI Variable Text" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Foreground" Value="{StaticResource NectarInkBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <!-- Dot-matrix stand-in. Drop a font in Assets/Fonts and change this one value to
+         "ms-appx:///Assets/Fonts/<file>.ttf#<Family Name>" to switch the timer face. -->
+    <FontFamily x:Key="NectarTimerFontFamily">Consolas</FontFamily>
+
+    <Style x:Key="TimerDisplayTextStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource NectarTimerFontFamily}" />
+        <Setter Property="FontSize" Value="48" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="CharacterSpacing" Value="30" />
+        <Setter Property="Foreground" Value="{StaticResource NectarInkBrush}" />
+        <Setter Property="IsTextScaleFactorEnabled" Value="False" />
+    </Style>
+
+    <Style x:Key="CardChipTextStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Segoe UI Variable Text" />
+        <Setter Property="FontSize" Value="10.5" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{StaticResource NectarInkBrush}" />
+    </Style>
+
+    <!-- ==========================================================================
+         Controls
+         ========================================================================== -->
+    <Style x:Key="ShellIconButtonStyle" TargetType="Button">
+        <Setter Property="Width" Value="26" />
+        <Setter Property="Height" Value="26" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="CornerRadius" Value="13" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Foreground" Value="#B8FFFFFF" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="UseSystemFocusVisuals" Value="False" />
+    </Style>
+
+    <SolidColorBrush x:Key="NectarTabTrackBrush" Color="#1C1F24" />
+    <SolidColorBrush x:Key="NectarTabActiveBrush" Color="#3B424B" />
+
+    <Style x:Key="ShellTabButtonStyle" TargetType="Button">
+        <Setter Property="Padding" Value="10,4" />
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="CornerRadius" Value="9" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="FontFamily" Value="Segoe UI Variable Text" />
+        <Setter Property="FontSize" Value="10.5" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="#8AFFFFFF" />
+        <Setter Property="UseSystemFocusVisuals" Value="False" />
+    </Style>
+
+    <Style x:Key="StepperButtonStyle" TargetType="Button">
+        <Setter Property="Width" Value="24" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="Background" Value="{StaticResource NectarChipBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Foreground" Value="{StaticResource NectarInkBrush}" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="UseSystemFocusVisuals" Value="False" />
+    </Style>
+
+    <Style x:Key="CardItemContainerStyle" TargetType="ListViewItem">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Margin" Value="0,0,0,3" />
+        <Setter Property="MinHeight" Value="0" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="UseSystemFocusVisuals" Value="False" />
+    </Style>
+
+    <Style x:Key="CardTextBoxStyle" TargetType="TextBox">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="FontFamily" Value="Segoe UI Variable Text" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Foreground" Value="{StaticResource NectarInkBrush}" />
+        <Setter Property="PlaceholderForeground" Value="{StaticResource NectarInkMutedBrush}" />
+        <Setter Property="SelectionHighlightColor" Value="#402E6B4A" />
+        <Setter Property="UseSystemFocusVisuals" Value="False" />
+    </Style>
+
+    <Style x:Key="CardNoteTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource CardTextBoxStyle}">
+        <Setter Property="AcceptsReturn" Value="True" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="VerticalContentAlignment" Value="Top" />
+        <Setter Property="FontSize" Value="12.5" />
+    </Style>
+
+    <!-- Focus-expiry tray actions: flat pills with a bare template so the tray's own greys and
+         accent orange are never replaced by the default Button hover brushes. -->
+    <Style x:Key="TrayChipButtonStyle" TargetType="Button">
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="CornerRadius" Value="16" />
+        <Setter Property="Padding" Value="11,6" />
+        <Setter Property="FontFamily" Value="Segoe UI Variable Text" />
+        <Setter Property="FontSize" Value="11.5" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="UseSystemFocusVisuals" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        BorderThickness="0"
+                        CornerRadius="{TemplateBinding CornerRadius}">
+                        <ContentPresenter
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="TrayActionButtonStyle" TargetType="Button">
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="CornerRadius" Value="16" />
+        <Setter Property="Padding" Value="14,8" />
+        <Setter Property="FontFamily" Value="Segoe UI Variable Text" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="UseSystemFocusVisuals" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        BorderThickness="0"
+                        CornerRadius="{TemplateBinding CornerRadius}">
+                        <ContentPresenter
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Tasks / Focus toggle inside the Insights chart card. The template is deliberately bare:
+         the selected segment's brush comes from the view model, so a hover state would fight it. -->
+    <Style x:Key="ChartPillButtonStyle" TargetType="Button">
+        <Setter Property="Padding" Value="18,6" />
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="FontFamily" Value="Segoe UI Variable Text" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="UseSystemFocusVisuals" Value="False" />
+    </Style>
+
+    <Style x:Key="PillActionButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource NectarChipActiveBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource NectarInkBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="CornerRadius" Value="14" />
+        <Setter Property="Padding" Value="10,7" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="FontFamily" Value="Segoe UI Variable Text" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="UseSystemFocusVisuals" Value="False" />
+    </Style>
+
+    <!-- The card text fields live on pastel paper. Their default dark-theme chrome paints a
+         dark slab once they take focus (which dictation does on purpose), so every state stays
+         transparent with ink-coloured text. -->
+    <SolidColorBrush x:Key="TextControlBackground" Color="Transparent" />
+    <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="Transparent" />
+    <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="Transparent" />
+    <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="Transparent" />
+    <SolidColorBrush x:Key="TextControlBorderBrush" Color="Transparent" />
+    <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="Transparent" />
+    <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="Transparent" />
+    <SolidColorBrush x:Key="TextControlBorderBrushDisabled" Color="Transparent" />
+    <SolidColorBrush x:Key="TextControlForegroundFocused" Color="#F21B241C" />
+    <SolidColorBrush x:Key="TextControlForegroundPointerOver" Color="#F21B241C" />
+
+    <!-- Microphone buttons on the tasks and notepad cards: a soft cream chip that warms on
+         hover and holds a green listening state. -->
+    <Style x:Key="DictationButtonStyle" TargetType="Button">
+        <Setter Property="Width" Value="26" />
+        <Setter Property="Height" Value="26" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="CornerRadius" Value="13" />
+        <Setter Property="Background" Value="#33FFFFFF" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Foreground" Value="{StaticResource NectarInkBrush}" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="UseSystemFocusVisuals" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid Background="Transparent">
+                        <Border
+                            x:Name="Chrome"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="#29FFFFFF"
+                            BorderThickness="1"
+                            CornerRadius="{TemplateBinding CornerRadius}" />
+                        <ContentPresenter
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}" />
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="PointerOver">
+                                    <VisualState.Setters>
+                                        <Setter Target="Chrome.Background" Value="#B3FFFFFF" />
+                                        <Setter Target="Chrome.BorderBrush" Value="#47FFFFFF" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                                <VisualState x:Name="Pressed">
+                                    <VisualState.Setters>
+                                        <Setter Target="Chrome.Background" Value="#E6FFFFFF" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                                <VisualState x:Name="Disabled">
+                                    <VisualState.Setters>
+                                        <Setter Target="Chrome.Opacity" Value="0.4" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="CardCircleButtonStyle" TargetType="Button">
+        <Setter Property="Width" Value="34" />
+        <Setter Property="Height" Value="34" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="CornerRadius" Value="17" />
+        <Setter Property="Background" Value="{StaticResource NectarChipBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Foreground" Value="{StaticResource NectarInkBrush}" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="UseSystemFocusVisuals" Value="False" />
+    </Style>
+
+
+    <!-- ==========================================================================
+         Settings (Customize and Insights): the sky card carries both companion panes.
+         ========================================================================== -->
+
+    <Style x:Key="SettingsHeaderTextStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Segoe UI Variable Text" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{StaticResource NectarInkBrush}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <Style x:Key="SettingLabelTextStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Segoe UI Variable Text" />
+        <Setter Property="FontSize" Value="11.5" />
+        <Setter Property="Foreground" Value="{StaticResource NectarInkBrush}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <Style x:Key="SettingValueTextStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Segoe UI Variable Text" />
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{StaticResource NectarInkMutedBrush}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <Style x:Key="SettingHintTextStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Segoe UI Variable Text" />
+        <Setter Property="FontSize" Value="10.5" />
+        <Setter Property="Foreground" Value="{StaticResource NectarInkFaintBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <Style x:Key="SettingsSectionHeaderTextStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Segoe UI Variable Text" />
+        <Setter Property="FontSize" Value="10" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="CharacterSpacing" Value="90" />
+        <Setter Property="Foreground" Value="{StaticResource NectarInkMutedBrush}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <!-- Filled action on a pastel card (Connect): dark ink so it reads on every card colour. -->
+    <Style x:Key="SettingsPrimaryButtonStyle" TargetType="Button">
+        <Setter Property="Padding" Value="14,6" />
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="CornerRadius" Value="9" />
+        <Setter Property="Background" Value="#FF232A38" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="FontFamily" Value="Segoe UI Variable Text" />
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="#FFF6EFE1" />
+        <Setter Property="UseSystemFocusVisuals" Value="False" />
+    </Style>
+
+    <Style x:Key="GhostActionButtonStyle" TargetType="Button">
+        <Setter Property="Padding" Value="9,4" />
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Background" Value="#5CFFFFFF" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="FontFamily" Value="Segoe UI Variable Text" />
+        <Setter Property="FontSize" Value="10.5" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{StaticResource NectarInkBrush}" />
+        <Setter Property="UseSystemFocusVisuals" Value="False" />
+    </Style>
+
+    <Style x:Key="SettingsToggleStyle" TargetType="ToggleSwitch">
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="Margin" Value="0,0,-6,0" />
+        <Setter Property="OnContent" Value="" />
+        <Setter Property="OffContent" Value="" />
+        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="UseSystemFocusVisuals" Value="False" />
+    </Style>
+
+
+    <!-- Switches on the blue Customize card: near-black track, cream knob. -->
+    <SolidColorBrush x:Key="ToggleSwitchFillOn" Color="#FF232A38" />
+    <SolidColorBrush x:Key="ToggleSwitchFillOnPointerOver" Color="#FF303A4C" />
+    <SolidColorBrush x:Key="ToggleSwitchFillOnPressed" Color="#FF1A2029" />
+    <SolidColorBrush x:Key="ToggleSwitchStrokeOn" Color="#FF232A38" />
+    <SolidColorBrush x:Key="ToggleSwitchStrokeOnPointerOver" Color="#FF303A4C" />
+    <SolidColorBrush x:Key="ToggleSwitchKnobFillOn" Color="#FFF6EFE1" />
+    <SolidColorBrush x:Key="ToggleSwitchFillOff" Color="#4DFFFFFF" />
+    <SolidColorBrush x:Key="ToggleSwitchFillOffPointerOver" Color="#66FFFFFF" />
+    <SolidColorBrush x:Key="ToggleSwitchFillOffPressed" Color="#40FFFFFF" />
+    <SolidColorBrush x:Key="ToggleSwitchStrokeOff" Color="#59FFFFFF" />
+    <SolidColorBrush x:Key="ToggleSwitchStrokeOffPointerOver" Color="#80FFFFFF" />
+    <SolidColorBrush x:Key="ToggleSwitchKnobFillOff" Color="#FFF6EFE1" />
+
+    <Style x:Key="SettingsCardRowStyle" TargetType="Border">
+        <Setter Property="Padding" Value="10,8" />
+        <Setter Property="Background" Value="#59FFFFFF" />
+        <Setter Property="CornerRadius" Value="10" />
+    </Style>
+
+</ResourceDictionary>

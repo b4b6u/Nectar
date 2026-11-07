@@ -1,0 +1,50 @@
+name: Tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Runs on a stock Windows runner with the public .NET SDK only: no secrets, no signing
+  # certificate, no cloud account. The tests compile the encryption and dictation sources directly.
+  app-tests:
+    name: Encryption and dictation
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Test
+        run: dotnet test tests/Nectar.Tests/Nectar.Tests.csproj -c Release --logger "console;verbosity=normal"
+
+  feed-tests:
+    # This exact name is the required status check on main: a red run must block merging.
+    name: App Installer feed
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install
+        run: npm install --no-audit --no-fund
+
+      - name: Type-check and test the feed
+        run: npm test

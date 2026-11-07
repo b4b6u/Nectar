@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- The app project is a WinUI executable, so tests cannot reference it directly. They compile
+       the data/dictation sources that carry the logic under test, plus a logging stub, into a
+       plain net8.0 library. This keeps `dotnet test` runnable on any Windows SDK machine. -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>Nectar.Tests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+    <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="8.0.33" />
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlcipher" Version="2.1.10" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\Nectar\Data\DatabaseEncryption.cs" Link="Source\DatabaseEncryption.cs" />
+    <Compile Include="..\..\Nectar\Interop\DataProtection.cs" Link="Source\DataProtection.cs" />
+    <Compile Include="..\..\Nectar\Services\AtomicFile.cs" Link="Source\AtomicFile.cs" />
+    <Compile Include="..\..\Nectar\Services\NetworkGuard.cs" Link="Source\NetworkGuard.cs" />
+    <Compile Include="..\..\Nectar\Services\Dictation\DictationFallback.cs" Link="Source\DictationFallback.cs" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Privacy — Nectar</title>
+  <meta name="description" content="Nectar keeps tasks, notes, focus sessions and calendar tokens on your own PC. No account, no telemetry, no analytics — and this site sets no cookies." />
+  <meta name="theme-color" content="#08080a" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- SITE_URL: same placeholder host as index.html, robots.txt and sitemap.xml. -->
+  <link rel="canonical" href="https://nectar.vercel.app/privacy" />
+
+  <meta property="og:site_name" content="Nectar" />
+  <meta property="og:title" content="Privacy — Nectar" />
+  <meta property="og:description" content="Everything Nectar stores lives in one folder on your PC. No account, no telemetry, no analytics." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://nectar.vercel.app/privacy" />
+  <meta property="og:image" content="https://nectar.vercel.app/og-image.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Sans:ital,wght@0,400..700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="site.css" />
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="pillbar" id="top">
+    <div class="pillbar__inner">
+      <a class="brand" href="index.html" aria-label="Nectar, back to the landing page">
+        <img class="brand__mark" src="Nectar/Assets/nectar-mark.scale-400.png" alt="" width="28" height="28" />
+        <span class="brand__name">NECTAR</span>
+        <span class="brand__ver">v2</span>
+      </a>
+
+      <button class="pillbar__toggle" id="navToggle" aria-expanded="false" aria-controls="nav">
+        <span></span><span></span>
+        <span class="sr">Menu</span>
+      </button>
+
+      <nav class="nav" id="nav" aria-label="Sections">
+        <a href="index.html">Home</a>
+        <a href="index.html#install">Install</a>
+        <a href="privacy.html" aria-current="page">Privacy</a>
+        <a href="licence.html">Licence</a>
+        <a class="nav__repo" data-repo href="index.html#install">
+          <svg viewBox="0 0 16 16" aria-hidden="true" width="15" height="15"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38l-.01-1.49c-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48l-.01 2.2c0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+          GitHub
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="page">
+      <header class="page__head">
+        <p class="eyebrow">Legal</p>
+        <h1>Privacy</h1>
+        <p class="page__lede">
+          Nectar has no account, no server and no analytics. What you type into it stays in one
+          folder on your own PC — this page lists exactly what that folder holds, and what leaves
+          the machine when you link a calendar.
+        </p>
+        <p class="page__meta">Last updated 7 November 2026 · Covers Nectar 2.0.0 and this website</p>
+      </header>
+
+      <div class="legal">
+        <nav class="legal__toc" aria-label="On this page">
+          <p>On this page</p>
+          <ol>
+            <li><a href="#short">The short version</a></li>
+            <li><a href="#stored">What is stored</a></li>
+            <li><a href="#calendar">Calendar connections</a></li>
+            <li><a href="#network">What goes online</a></li>
+            <li><a href="#site">This website</a></li>
+            <li><a href="#control">Your control</a></li>
+            <li><a href="#contact">Questions</a></li>
+          </ol>
+        </nav>
+
+        <div class="legal__body">
+          <section id="short">
+            <h2>The short version</h2>
+            <p>
+              There is no Nectar account and no Nectar backend. The app does not send usage data,
+              crash reports or diagnostics anywhere, because there is nowhere for them to go: the
+              only network requests it makes are the calendar calls you set up yourself.
+            </p>
+            <div class="legal__note">
+              <p><strong>No data is sold, shared or mined.</strong> There is no server holding your
+              tasks, and no third-party analytics library in the app.</p>
+            </div>
+          </section>
+
+          <section id="stored">
+            <h2>What is stored, and where</h2>
+            <p>
+              Everything lives in <code>%LOCALAPPDATA%\Nectar</code>. The folder is yours: copy it,
+              back it up, or delete it.
+            </p>
+            <div class="legal__tablewrap">
+              <table class="legal__table">
+                <thead>
+                  <tr><th>File</th><th>Contents</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>nectar.db</td>
+                    <td>An SQLite database: your tasks and their completion dates, the scratchpad note, and one row per focus session.</td>
+                  </tr>
+                  <tr>
+                    <td>settings.json</td>
+                    <td>Plain text preferences — the shortcut, the hover band and pill switches, card order and visibility, focus length, sound settings, and the calendar client ID and tenant you entered.</td>
+                  </tr>
+                  <tr>
+                    <td>Token file</td>
+                    <td>The calendar access and refresh tokens, encrypted with DPAPI for your Windows user. Another account on the same machine cannot read them.</td>
+                  </tr>
+                  <tr>
+                    <td>nectar.log</td>
+                    <td>A diagnostic log the app appends to while it runs. It can include the title of a reminder that fired, so treat it as personal if your event names are.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              There is no cloud sync and no hidden copy elsewhere. Pinning Nectar to another machine
+              means copying the folder yourself.
+            </p>
+          </section>
+
+          <section id="calendar">
+            <h2>Calendar connections</h2>
+            <p>
+              Linking a calendar is optional and uses OAuth with PKCE against <em>your own</em>
+              client ID: you create the app registration with Google or Microsoft, and paste its ID
+              into Nectar. There is no shared Nectar client credential, and no intermediary server
+              sitting between the app and the provider.
+            </p>
+            <p>The scopes requested are the narrowest that still show a day:</p>
+            <ul>
+              <li><strong>Google</strong> — <code>calendar.readonly</code>, read access only.</li>
+              <li><strong>Microsoft</strong> — <code>offline_access</code> and <code>Calendars.Read</code>, so the app can refresh a token and read events.</li>
+            </ul>
+            <p>
+              Tokens are sealed with DPAPI (user scope) and never leave the machine. Nectar cannot
+              write to, move or delete anything in your calendar. Google or Microsoft still see the
+              requests the app makes to them, under their own privacy policies — that part is
+              between you and whichever provider you link.
+            </p>
+          </section>
+
+          <section id="network">
+            <h2>What actually goes online</h2>
+            <p>The app talks to these hosts and no others:</p>
+            <ul>
+              <li><code>accounts.google.com</code>, <code>oauth2.googleapis.com</code> and <code>www.googleapis.com</code> for Google sign-in and events.</li>
+              <li><code>login.microsoftonline.com</code> and <code>graph.microsoft.com</code> for Microsoft sign-in and events.</li>
+            </ul>
+            <p>
+              There is no update check, no licence check, no heartbeat and no telemetry endpoint.
+              Unlink the calendar and Nectar makes no network requests at all.
+            </p>
+          </section>
+
+          <section id="site">
+            <h2>This website</h2>
+            <p>
+              The landing page sets no cookies, runs no analytics and loads no third-party scripts.
+              There is no consent banner because there is nothing to consent to.
+            </p>
+            <p>Two things are outside the page's control:</p>
+            <ul>
+              <li>
+                <strong>Fonts</strong> are served by Google Fonts, which receives the request — your
+                IP address, browser and the page you came from — under Google's privacy policy.
+              </li>
+              <li>
+                <strong>Hosting</strong> is Vercel, which keeps standard server logs (IP address,
+                user agent, requested path) as any web host does.
+              </li>
+            </ul>
+            <p>
+              No form on this site collects anything, and the site has no database of its own.
+            </p>
+          </section>
+
+          <section id="control">
+            <h2>Your control</h2>
+            <ul>
+              <li><strong>Unlink a calendar</strong> in Customize → General; the stored tokens are discarded.</li>
+              <li><strong>Revoke access</strong> at <a href="https://myaccount.google.com/permissions" rel="noreferrer" target="_blank">Google</a> or <a href="https://account.live.com/consent/Manage" rel="noreferrer" target="_blank">Microsoft</a>, which cuts Nectar off even if a token were left behind.</li>
+              <li><strong>Delete everything</strong> by removing <code>%LOCALAPPDATA%\Nectar</code> while the app is closed. There is no remote copy to clean up.</li>
+            </ul>
+          </section>
+
+          <section id="contact">
+            <h2>Questions</h2>
+            <p>
+              Open an issue in the project repository, or read the source: the calendar client and
+              the token store are small enough to check the claims on this page yourself.
+              Licence terms are on the <a href="licence.html">licence page</a>.
+            </p>
+          </section>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__brand">
+      <img src="Nectar/Assets/nectar-mark.scale-400.png" alt="" width="24" height="24" />
+      <span>Nectar v2</span>
+    </div>
+    <p class="footer__line">A top-edge workspace for Windows · WinUI 3, .NET 8 · handmade, no web view.</p>
+    <div class="footer__links">
+      <a data-repo href="index.html#install">GitHub</a>
+      <a href="index.html#install">Install</a>
+      <a href="privacy.html" aria-current="page">Privacy</a>
+      <a href="licence.html">Licence</a>
+    </div>
+  </footer>
+
+  <script src="site.js" defer></script>
+</body>
+</html>

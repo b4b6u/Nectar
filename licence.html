@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Licence — Nectar</title>
+  <meta name="description" content="Nectar is released under the MIT licence. Read the full text, what it permits, and the licences of the Microsoft, SQLite and type components it ships with." />
+  <meta name="theme-color" content="#08080a" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- SITE_URL: same placeholder host as index.html, robots.txt and sitemap.xml. -->
+  <link rel="canonical" href="https://nectar.vercel.app/licence" />
+
+  <meta property="og:site_name" content="Nectar" />
+  <meta property="og:title" content="Licence — Nectar" />
+  <meta property="og:description" content="MIT, in full, plus the third-party notices for the Windows App SDK, SQLite and the typefaces." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://nectar.vercel.app/licence" />
+  <meta property="og:image" content="https://nectar.vercel.app/og-image.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <link rel="icon" href="/favicon.ico" sizes="48x48" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Sans:ital,wght@0,400..700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="site.css" />
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="pillbar" id="top">
+    <div class="pillbar__inner">
+      <a class="brand" href="index.html" aria-label="Nectar, back to the landing page">
+        <img class="brand__mark" src="Nectar/Assets/nectar-mark.scale-400.png" alt="" width="28" height="28" />
+        <span class="brand__name">NECTAR</span>
+        <span class="brand__ver">v2</span>
+      </a>
+
+      <button class="pillbar__toggle" id="navToggle" aria-expanded="false" aria-controls="nav">
+        <span></span><span></span>
+        <span class="sr">Menu</span>
+      </button>
+
+      <nav class="nav" id="nav" aria-label="Sections">
+        <a href="index.html">Home</a>
+        <a href="index.html#install">Install</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="licence.html" aria-current="page">Licence</a>
+        <a class="nav__repo" data-repo href="index.html#install">
+          <svg viewBox="0 0 16 16" aria-hidden="true" width="15" height="15"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38l-.01-1.49c-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48l-.01 2.2c0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+          GitHub
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="page">
+      <header class="page__head">
+        <p class="eyebrow">Legal</p>
+        <h1>Licence</h1>
+        <p class="page__lede">
+          Nectar is free and open source under the MIT licence: use it, read it, change it, ship it
+          inside something else. Below is the licence in full, what it lets you do in plainer words,
+          and the terms of the pieces Nectar is built from.
+        </p>
+        <p class="page__meta">Last updated 7 November 2026 · Applies to Nectar 2.0.0</p>
+      </header>
+
+      <div class="legal">
+        <nav class="legal__toc" aria-label="On this page">
+          <p>On this page</p>
+          <ol>
+            <li><a href="#mit">The MIT licence</a></li>
+            <li><a href="#means">What it lets you do</a></li>
+            <li><a href="#third-party">Third-party components</a></li>
+            <li><a href="#brand">The name and the bird</a></li>
+            <li><a href="#contributions">Contributions</a></li>
+          </ol>
+        </nav>
+
+        <div class="legal__body">
+          <section id="mit">
+            <h2>The MIT licence</h2>
+            <p>Nectar — the application, the landing page and the source — is released under MIT:</p>
+            <pre class="legal__licence">MIT License
+
+Copyright (c) 2026 Nectar contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.</pre>
+          </section>
+
+          <section id="means">
+            <h2>What it lets you do</h2>
+            <ul>
+              <li><strong>Run it anywhere.</strong> Personal, academic or commercial use, on as many machines as you like, at no cost.</li>
+              <li><strong>Change it.</strong> Fork the source, strip the calendar card out, rewrite the timer — no permission needed.</li>
+              <li><strong>Pass it on.</strong> Bundle Nectar into another product, or sell a build, as long as the copyright notice and the permission notice travel with it.</li>
+            </ul>
+            <p>
+              What it does not give you is a warranty: if the timer misses a meeting, the licence
+              says the authors are not liable. Keep the notices, and you are done — MIT has no
+              copyleft clause, so your own changes can stay closed if you want them to.
+            </p>
+            <div class="legal__note">
+              <p><strong>Redistributing a build?</strong> Ship the licence text beside the binary, and
+              a self-signed or missing code signature will still make Windows warn about the
+              publisher — that is separate from the licence.</p>
+            </div>
+          </section>
+
+          <section id="third-party">
+            <h2>Third-party components</h2>
+            <p>
+              Nectar is native C# rather than a bundled browser, so the list is short. These are the
+              pieces that end up in a published build, with their own terms:
+            </p>
+            <div class="legal__tablewrap">
+              <table class="legal__table">
+                <thead>
+                  <tr><th>Component</th><th>Licence</th><th>Notes</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Windows App SDK · WinUI 3</td>
+                    <td>MIT</td>
+                    <td>Microsoft. Copied beside the executable, because Nectar ships self-contained.</td>
+                  </tr>
+                  <tr>
+                    <td>.NET 8 runtime</td>
+                    <td>MIT</td>
+                    <td>Microsoft. Bundled in the publish folder, so nothing needs installing first.</td>
+                  </tr>
+                  <tr>
+                    <td>Entity Framework Core + SQLite provider</td>
+                    <td>MIT</td>
+                    <td>Microsoft. Reads and writes <code>nectar.db</code>.</td>
+                  </tr>
+                  <tr>
+                    <td>Microsoft.Win32.SystemEvents</td>
+                    <td>MIT</td>
+                    <td>Microsoft. Notices when the PC suspends or the display changes.</td>
+                  </tr>
+                  <tr>
+                    <td>SQLite</td>
+                    <td>Public domain</td>
+                    <td>The SQLite authors dedicated it to the public domain.</td>
+                  </tr>
+                  <tr>
+                    <td>Bricolage Grotesque · Instrument Sans · IBM Plex Mono</td>
+                    <td>SIL Open Font License 1.1</td>
+                    <td>Headings, body and code on this site, served through Google Fonts.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              The Windows SDK build tools are used to compile and sign but are not redistributed, and
+              there are no other third-party libraries in the app — no Electron, no web view, no
+              charting package.
+            </p>
+          </section>
+
+          <section id="brand">
+            <h2>The name and the bird</h2>
+            <p>
+              The MIT licence covers the code. It does not hand over the Nectar name or the
+              hummingbird mark, which identify this project: a fork is welcome, but it should ship
+              under its own name and icon so people can tell the two apart. The logo itself is
+              included in the repository for building and distributing Nectar, not for unrelated
+              branding.
+            </p>
+          </section>
+
+          <section id="contributions">
+            <h2>Contributions</h2>
+            <p>
+              Bug reports, fixes and features are welcome in the repository. Anything merged is
+              accepted under the same MIT terms, so the project stays equally free for everyone who
+              picks it up next.
+            </p>
+            <p>
+              How the app handles your data is on the <a href="privacy.html">privacy page</a>.
+            </p>
+          </section>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__brand">
+      <img src="Nectar/Assets/nectar-mark.scale-400.png" alt="" width="24" height="24" />
+      <span>Nectar v2</span>
+    </div>
+    <p class="footer__line">A top-edge workspace for Windows · WinUI 3, .NET 8 · handmade, no web view.</p>
+    <div class="footer__links">
+      <a data-repo href="index.html#install">GitHub</a>
+      <a href="index.html#install">Install</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="licence.html" aria-current="page">Licence</a>
+    </div>
+  </footer>
+
+  <script src="site.js" defer></script>
+</body>
+</html>
