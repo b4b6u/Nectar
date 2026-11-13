@@ -12,7 +12,7 @@ Unicode true
 !include "MUI2.nsh"
 
 !ifndef APP_VERSION
-  !define APP_VERSION "1.0.0"
+  !define APP_VERSION "1.0.1"
 !endif
 !ifndef APP_SOURCE
   !define APP_SOURCE "..\build\installer\payload"

@@ -24,7 +24,7 @@ export default function PrivacyPage() {
     <LegalLayout
       title="Privacy"
       lede="Nectar has no account, no server and no analytics. What you type into it stays in one folder on your own PC — this page lists exactly what that folder holds, and what leaves the machine when you link a calendar."
-      updated="Last updated 13 November 2026 · Covers Nectar 1.0.0 and this website"
+      updated="Last updated 13 November 2026 · Covers Nectar 1.0.1 and this website"
       toc={TOC}
     >
       <section id="short">

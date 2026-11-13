@@ -22,7 +22,7 @@ const STRUCTURED_DATA = {
   applicationCategory: "ProductivityApplication",
   applicationSubCategory: "Desktop productivity overlay",
   operatingSystem: "Windows 10, Windows 11",
-  softwareVersion: "1.0.0",
+  softwareVersion: "1.0.1",
   isAccessibleForFree: true,
   inLanguage: "en",
   offers: {

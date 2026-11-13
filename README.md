@@ -115,7 +115,7 @@ certificate, checks the signature and prints the SHA-256. The result is
 dist\Nectar-<version>-x64.msix.
 
 ```powershell
-Add-AppxPackage -Path .\dist\Nectar-1.0.0-x64.msix
+Add-AppxPackage -Path .\dist\Nectar-1.0.1-x64.msix
 ```
 
 Windows lists Nectar in the Start menu, and the first launch drops **Nectar.lnk** on the desktop

@@ -190,10 +190,13 @@ jobs:
 
           # A format string, not a here-string: PowerShell wants the closing "@ in column 0, which
           # would end the YAML block scalar this script lives in.
+          # The feed's own Version tracks the package identity: Windows compares it to notice that
+          # the feed itself changed, so leaving it frozen at 1.0.0.0 would make every later release
+          # look like the same feed as the first one.
           $template = '<?xml version="1.0" encoding="utf-8"?>
           <AppInstaller
               xmlns="http://schemas.microsoft.com/appx/appinstaller/2018"
-              Version="1.0.0.0"
+              Version="{2}"
               Uri="{0}/nectar.appinstaller">
 
             <MainPackage

@@ -116,10 +116,13 @@ export function buildAppInstaller(feed: AppInstallerFeed): string {
     throw new Error("A publisher is required; the manifest and certificate must agree.");
   }
 
+  // The feed document's own Version tracks the package: Windows compares that attribute to
+  // decide whether the feed changed, so a frozen 1.0.0.0 would make every later release look
+  // identical to the first.
   return `<?xml version="1.0" encoding="utf-8"?>
 <AppInstaller
     xmlns="http://schemas.microsoft.com/appx/appinstaller/2018"
-    Version="1.0.0.0"
+    Version="${escapeXml(feed.version)}"
     Uri="${escapeXml(feed.feedUrl)}">
 
   <MainPackage

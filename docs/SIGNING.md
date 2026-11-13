@@ -96,7 +96,7 @@ Get-ChildItem Cert:\LocalMachine\TrustedPeople | Where-Object Subject -eq 'CN=Ne
 ## 3. Install
 
 ```powershell
-Add-AppxPackage -Path .\dist\Nectar-1.0.0-x64.msix
+Add-AppxPackage -Path .\dist\Nectar-1.0.1-x64.msix
 ```
 
 Windows adds Nectar to the Start menu and the first launch writes `Nectar.lnk` to the desktop,
@@ -110,10 +110,10 @@ Get-AppxPackage Nectar.Desktop | Remove-AppxPackage
 ## 4. Verify by hand
 
 ```powershell
-Get-AuthenticodeSignature .\dist\Nectar-1.0.0-x64.msix |
+Get-AuthenticodeSignature .\dist\Nectar-1.0.1-x64.msix |
   Format-List Status, StatusMessage, SignerCertificate
 
-Get-FileHash .\dist\Nectar-1.0.0-x64.msix -Algorithm SHA256
+Get-FileHash .\dist\Nectar-1.0.1-x64.msix -Algorithm SHA256
 Get-AppxPackage Nectar.Desktop | Format-List Name, Version, PackageFullName, Status
 ```
 

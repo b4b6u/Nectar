@@ -44,7 +44,7 @@ export default function LicencePage() {
     <LegalLayout
       title="Licence"
       lede="Nectar is free and open source under the MIT licence: use it, read it, change it, ship it inside something else. Below is the licence in full, what it lets you do in plainer words, and the terms of the pieces Nectar is built from."
-      updated="Last updated 13 November 2026 · Applies to Nectar 1.0.0"
+      updated="Last updated 13 November 2026 · Applies to Nectar 1.0.1"
       toc={TOC}
     >
       <section id="mit">
