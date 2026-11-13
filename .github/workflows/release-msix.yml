@@ -144,9 +144,24 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path build | Out-Null
-          Invoke-WebRequest -Uri 'https://downloads.sourceforge.net/project/nsis/NSIS%203/3.11/nsis-3.11.zip' -OutFile 'build/nsis.zip'
-          Expand-Archive -Path 'build/nsis.zip' -DestinationPath 'build' -Force
+          $url = 'https://downloads.sourceforge.net/project/nsis/NSIS%203/3.11/nsis-3.11.zip'
+
+          # curl rather than Invoke-WebRequest: the SourceForge mirror redirects to a per-download
+          # host, and curl reports a status code we can act on instead of a bare exception.
+          curl.exe -sSL --retry 3 --retry-delay 2 --fail -o 'build/nsis.zip' $url
+          if ($LASTEXITCODE -ne 0) { throw "Downloading NSIS from $url failed with exit code $LASTEXITCODE" }
+
+          # A mirror that answers with an HTML block page gets written to the file just the same;
+          # fail on the magic bytes so the log says what happened instead of an unzip error.
+          $bytes = [IO.File]::ReadAllBytes('build/nsis.zip')
+          if ($bytes.Length -lt 1000000 -or $bytes[0] -ne 0x50 -or $bytes[1] -ne 0x4B) {
+            throw "build/nsis.zip is not a zip ($($bytes.Length) bytes); the mirror served something else."
+          }
+
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          [IO.Compression.ZipFile]::ExtractToDirectory((Resolve-Path 'build/nsis.zip').Path, (Resolve-Path 'build').Path, $true)
           if (-not (Test-Path 'build/nsis-3.11/makensis.exe')) { throw 'makensis.exe is missing after extracting NSIS.' }
+          Write-Host "makensis: $((Get-Item 'build/nsis-3.11/makensis.exe').Length) bytes"
 
       - name: Build the setup exe and the portable zip
         shell: pwsh
