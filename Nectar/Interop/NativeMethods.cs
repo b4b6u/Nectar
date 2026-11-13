@@ -41,6 +41,7 @@ internal static class NativeMethods
     internal const int WM_QUIT = 0x0012;
     internal const int WM_DISPLAYCHANGE = 0x007E;
     internal const int WM_SETTINGCHANGE = 0x001A;
+    internal const int WM_WINDOWPOSCHANGING = 0x0046;
 
     internal const int WA_INACTIVE = 0;
     internal const int MA_ACTIVATE = 1;
@@ -245,4 +246,20 @@ internal static class NativeMethods
     // ---- dwmapi --------------------------------------------------------------------------
     [DllImport("dwmapi.dll")]
     internal static extern int DwmSetWindowAttribute(IntPtr hwnd, int attribute, ref int pvAttribute, int cbAttribute);
+
+    /// <summary>
+    /// The WINDOWPOS block handed to WM_WINDOWPOSCHANGING. Layout matters: two pointer-sized
+    /// handles followed by four 32-bit values and the flags word.
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct WINDOWPOS
+    {
+        internal IntPtr hwnd;
+        internal IntPtr hwndInsertAfter;
+        internal int x;
+        internal int y;
+        internal int cx;
+        internal int cy;
+        internal uint flags;
+    }
 }

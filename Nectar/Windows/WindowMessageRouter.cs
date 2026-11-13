@@ -28,6 +28,15 @@ internal sealed class WindowMessageRouter : IDisposable
     /// <summary>Supplied by FocusGate: returns MA_ACTIVATE / MA_NOACTIVATE.</summary>
     internal Func<int>? MouseActivateEvaluator { get; set; }
 
+    /// <summary>
+    /// While true, every z-order change the shell or WinUI attempts is rewritten to HWND_TOPMOST.
+    /// Setting the band once at startup is not enough: showing the window, moving it and the
+    /// presenter's own activation bookkeeping each issue their own SetWindowPos, and any of them
+    /// can drop the window into the normal band, which is exactly how an overlay ends up behind
+    /// the app it is supposed to float over.
+    /// </summary>
+    internal bool KeepOnTop { get; set; } = true;
+
     /// <summary>Raised with true when the window is being activated, false when deactivated.</summary>
     internal event EventHandler<bool>? ActivationChanged;
 
@@ -47,6 +56,27 @@ internal sealed class WindowMessageRouter : IDisposable
 
         _attached = NativeMethods.SetWindowSubclass(_hwnd, _proc, SubclassId, IntPtr.Zero);
         return _attached;
+    }
+
+    /// <summary>
+    /// Forces the pending z-order change to keep the window in the top-most band. Requests that
+    /// already carry SWP_NOZORDER carry no z-order intent, so they are left untouched.
+    /// </summary>
+    private static void PinTopMost(IntPtr lParam)
+    {
+        if (lParam == IntPtr.Zero)
+        {
+            return;
+        }
+
+        var pos = Marshal.PtrToStructure<NativeMethods.WINDOWPOS>(lParam);
+        if ((pos.flags & NativeMethods.SWP_NOZORDER) != 0 || pos.hwndInsertAfter == NativeMethods.HWND_TOPMOST)
+        {
+            return;
+        }
+
+        pos.hwndInsertAfter = NativeMethods.HWND_TOPMOST;
+        Marshal.StructureToPtr(pos, lParam, fDeleteOld: false);
     }
 
     private IntPtr OnMessage(IntPtr hWnd, uint uMsg, IntPtr wParam, IntPtr lParam, IntPtr uIdSubclass, IntPtr dwRefData)
@@ -70,6 +100,14 @@ internal sealed class WindowMessageRouter : IDisposable
                 case NativeMethods.WM_ACTIVATE:
                     var activating = ((int)wParam & 0xFFFF) != NativeMethods.WA_INACTIVE;
                     ActivationChanged?.Invoke(this, activating);
+                    break;
+
+                case NativeMethods.WM_WINDOWPOSCHANGING:
+                    if (KeepOnTop)
+                    {
+                        PinTopMost(lParam);
+                    }
+
                     break;
 
                 case NativeMethods.WM_DPICHANGED:

@@ -176,5 +176,13 @@ internal sealed class OverlayWindowController
 
     internal bool IsVisible => _appWindow.IsVisible;
 
-    internal void Resize(RectInt32 bounds) => _appWindow.MoveAndResize(bounds);
+    internal void Resize(RectInt32 bounds)
+    {
+        _appWindow.MoveAndResize(bounds);
+
+        // Moving the window issues its own z-order request; re-pinning here keeps the overlay on
+        // top through geometry changes (DPI, display changes, collapse/expand) rather than only
+        // at launch.
+        EnsureTopMost();
+    }
 }

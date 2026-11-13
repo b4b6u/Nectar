@@ -282,8 +282,11 @@ Nectar/
 
 - `AppWindow.IsShownInSwitchers = false` + `WS_EX_TOOLWINDOW` → no taskbar entry, no Alt-Tab.
 - `OverlappedPresenter.SetBorderAndTitleBar(false, false)`, not minimizable/maximizable/resizable.
-- `IsAlwaysOnTop = true` **and** `SetWindowPos(HWND_TOPMOST)` — the presenter flag alone did not
-  survive the first show, so the HWND is pinned explicitly on every show.
+- `IsAlwaysOnTop = true`, `SetWindowPos(HWND_TOPMOST)` on every show and resize, **and** a
+  `WM_WINDOWPOSCHANGING` hook that rewrites any z-order request to `HWND_TOPMOST`. Setting the
+  band once is not enough: showing the window, moving it and the presenter's activation
+  bookkeeping each issue their own `SetWindowPos`, and one of them dropping the window into the
+  normal band is what left the overlay behind other apps.
 - `WS_EX_NOACTIVATE` is applied with `GetWindowLongPtr`/`SetWindowLongPtr`. `WM_MOUSEACTIVATE`
   returns `MA_NOACTIVATE`, so clicking cards, buttons and task rows never touches the foreground
   window. Clicking a text field is the one explicit opt-in: the window drops the style, calls
