@@ -48,7 +48,10 @@ if (-not $version) { throw "Could not read <Version> from $project" }
 
 Write-Output "building Nectar $version (MSIX, x64, self-contained)"
 
+# -restore is explicit: a clean checkout (CI, a fresh clone) has no obj/project.assets.json, and
+# msbuild otherwise fails with NETSDK1004 before it ever reaches the compiler.
 & dotnet msbuild $project `
+    -restore `
     -p:Configuration=Release `
     -p:Platform=x64 `
     -p:RuntimeIdentifier=win-x64 `
