@@ -64,6 +64,22 @@ msedge --headless=new --window-size=1200,630 --force-device-scale-factor=1 \
 
 ---
 
+## Setup installer and portable zip
+
+```powershell
+.\scripts\package-installer.ps1
+```
+
+Publishes the same self-contained build, compresses it to `dist\Nectar-<version>-win-x64.zip` and
+compiles `dist\Nectar-Setup-<version>.exe` from `installer\nectar.nsi`. The setup installs per user
+to `%LOCALAPPDATA%\Programs\Nectar`, with desktop and Start-menu shortcuts and an uninstaller — no
+administrator rights and **no certificate to trust**, which is why it is the download offered to
+people. `makensis.exe` is expected in `build\nsis\` (the portable NSIS zip) or on `PATH`; the
+script accepts `-MakensisPath`.
+
+The MSIX above remains the packaged build with App Installer updates, but it only installs where its
+certificate is trusted (`docs/SIGNING.md`), so it is not the default download.
+
 ## Requirements
 
 | Item | Version |
