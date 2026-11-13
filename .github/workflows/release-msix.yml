@@ -133,6 +133,30 @@ jobs:
             throw "Packed version '$($identity.Version)' is not '${{ steps.v.outputs.identity }}'."
           }
 
+      # The download people actually click is the setup exe: it installs without trusting the
+      # self-signed certificate the MSIX needs. NSIS ships as a portable zip, so the runner needs no
+      # installer of its own.
+      - name: Fetch portable NSIS
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path build | Out-Null
+          Invoke-WebRequest -Uri 'https://downloads.sourceforge.net/project/nsis/NSIS%203/3.11/nsis-3.11.zip' -OutFile 'build/nsis.zip'
+          Expand-Archive -Path 'build/nsis.zip' -DestinationPath 'build' -Force
+          if (-not (Test-Path 'build/nsis-3.11/makensis.exe')) { throw 'makensis.exe is missing after extracting NSIS.' }
+
+      - name: Build the setup exe and the portable zip
+        shell: pwsh
+        run: |
+          ./scripts/package-installer.ps1 -MakensisPath 'build/nsis-3.11/makensis.exe'
+          if ($LASTEXITCODE -ne 0) { throw "package-installer.ps1 failed with $LASTEXITCODE" }
+
+          $setup = "dist/Nectar-Setup-${{ steps.v.outputs.version }}.exe"
+          if (-not (Test-Path $setup)) { throw "Expected $setup to exist" }
+
+          # Version-less alias: /releases/latest/download/Nectar-Setup.exe stays valid for every
+          # future release, and that is the URL the site links to.
+          Copy-Item $setup 'dist/Nectar-Setup.exe' -Force
+
       # The site's feed route reads <MainPackage Publisher=...> from this asset, so the download page
       # cannot disagree with the build it is serving. Windows also accepts the file directly.
       - name: Render the release .appinstaller
@@ -177,6 +201,9 @@ jobs:
         shell: pwsh
         run: |
           $files = @(
+            "dist/Nectar-Setup-${{ steps.v.outputs.version }}.exe",
+            'dist/Nectar-Setup.exe',
+            "dist/Nectar-${{ steps.v.outputs.version }}-win-x64.zip",
             "dist/Nectar-${{ steps.v.outputs.version }}-x64.msix",
             'dist/nectar.appinstaller'
           )
@@ -196,6 +223,12 @@ jobs:
         with:
           tag_name: v${{ steps.v.outputs.version }}
           files: |
+            dist/Nectar-Setup-${{ steps.v.outputs.version }}.exe
+            dist/Nectar-Setup-${{ steps.v.outputs.version }}.exe.sha256
+            dist/Nectar-Setup.exe
+            dist/Nectar-Setup.exe.sha256
+            dist/Nectar-${{ steps.v.outputs.version }}-win-x64.zip
+            dist/Nectar-${{ steps.v.outputs.version }}-win-x64.zip.sha256
             dist/Nectar-${{ steps.v.outputs.version }}-x64.msix
             dist/Nectar-${{ steps.v.outputs.version }}-x64.msix.sha256
             dist/nectar.appinstaller

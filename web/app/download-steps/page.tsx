@@ -9,7 +9,11 @@ export const metadata: Metadata = {
   alternates: { canonical: "/download-steps" }
 };
 
-const DOWNLOAD_URL = "/download/windows";
+/**
+ * A stable alias GitHub keeps pointing at the newest release that contains it, so this link survives
+ * every version and works from any host — no API route, no environment variable, no redeploy.
+ */
+const DOWNLOAD_URL = "https://github.com/b4b6u/Nectar/releases/latest/download/Nectar-Setup.exe";
 
 const STEPS = [
   {
