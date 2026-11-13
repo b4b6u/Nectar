@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const SITE_URL = "https://nectar.app";
+const SITE_URL = "https://nectar-chi-eight.vercel.app";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [

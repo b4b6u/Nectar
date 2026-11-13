@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://nectar.app"),
+  metadataBase: new URL("https://nectar-chi-eight.vercel.app"),
   title: "Nectar — your day, perfectly anchored",
   description:
     "A top-anchored workspace for Windows: tasks, a focus timer, a scratchpad and today's calendar drop out of the notch. Free.",
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     title: "Nectar — your day, perfectly anchored",
     description:
       "Tasks, focus timer, notepad and calendar in a Windows overlay that never steals focus.",
-    url: "https://nectar.app",
+    url: "https://nectar-chi-eight.vercel.app",
     siteName: "Nectar",
     images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Nectar for Windows" }],
     type: "website"

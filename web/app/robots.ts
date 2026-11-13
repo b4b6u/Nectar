@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 /** Same host as `metadataBase` in app/layout.tsx; change both together. */
-const SITE_URL = "https://nectar.app";
+const SITE_URL = "https://nectar-chi-eight.vercel.app";
 
 export default function robots(): MetadataRoute.Robots {
   return {

@@ -12,3 +12,6 @@ public/downloads/*.msix
 
 # Compiled output for the node --test suite.
 .test-build/
+
+.vercel
+.env*
