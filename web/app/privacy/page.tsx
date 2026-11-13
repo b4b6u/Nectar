@@ -131,8 +131,9 @@ export default function PrivacyPage() {
             Microsoft sign-in and events.
           </li>
           <li>
-            <code>nectar.app</code> for the installer feed, which the App Installer uses to fetch
-            updates. It is a plain file request; no identifier is attached to it.
+            <code>nectar.app</code> for the installer feed, which packaged (MSIX) copies use to
+            fetch updates. It is a plain file request; no identifier is attached to it. The plain
+            setup installer does not check for updates at all.
           </li>
         </ul>
         <p>

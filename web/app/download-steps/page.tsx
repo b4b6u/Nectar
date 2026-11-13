@@ -9,13 +9,13 @@ export const metadata: Metadata = {
   alternates: { canonical: "/download-steps" }
 };
 
-const DOWNLOAD_URL = "/downloads/nectar.appinstaller";
+const DOWNLOAD_URL = "/download/windows";
 
 const STEPS = [
   {
     number: "1",
     title: "Download the installer",
-    copy: "One small file, Nectar.appinstaller. Your browser may ask you to keep the download first — same check, one step earlier. Windows installs and updates the app from this file, so you never download an update by hand."
+    copy: "One file, Nectar-Setup. Your browser may ask you to keep the download first — the same check, one step earlier. It installs for your Windows user only, so there is no administrator prompt."
   },
   {
     number: "2",
@@ -280,7 +280,7 @@ export default function DownloadStepsPage() {
           </a>
 
           <p className="mt-5 font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
-            Windows 10 &amp; 11 · signed installer · no account needed
+            Windows 10 &amp; 11 · one setup file · no account needed
           </p>
 
           <p className="mt-8 text-[13px] text-muted">

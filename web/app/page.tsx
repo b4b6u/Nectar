@@ -423,9 +423,9 @@ export default function Home() {
                 Download it, run it, pin it.
               </h2>
               <p className="mt-5 text-[15px] leading-relaxed text-muted">
-                Nectar installs from a signed MSIX package through the App Installer. One download,
-                no .NET runtime to hunt down, and updates arrive on their own from this site&rsquo;s
-                feed. Windows asks once whether you trust it;{" "}
+                One setup file and nothing to hunt down: Nectar brings its own .NET runtime and
+                Windows App SDK. It installs for your Windows user, so there is no administrator
+                prompt — Windows only asks once whether you trust the file;{" "}
                 <a className="text-cream underline decoration-white/30 underline-offset-4" href="/download-steps">
                   here is exactly what to click
                 </a>
@@ -437,7 +437,8 @@ export default function Home() {
                   <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full border border-white/15 font-mono text-[11px] text-nectar">
                     1
                   </span>
-                  Download <code className="font-mono text-[13px] text-cream/90">Nectar.appinstaller</code>.
+                  Download <code className="font-mono text-[13px] text-cream/90">Nectar-Setup</code>{" "}
+                  and run it.
                 </li>
                 <li className="flex gap-3">
                   <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full border border-white/15 font-mono text-[11px] text-nectar">
@@ -467,8 +468,9 @@ export default function Home() {
               </p>
               <ul className="m-0 list-none space-y-3 p-0 text-[14px] leading-relaxed text-muted">
                 <li>Windows 10 build 19041 or later, or Windows 11.</li>
-                <li>About 60 MB of disk, and no administrator rights.</li>
-                <li>Nothing else — the Windows App SDK ships inside the package.</li>
+                <li>A ~70 MB download, about 280 MB once installed.</li>
+                <li>No administrator rights — it installs to your user folder.</li>
+                <li>Nothing else — the .NET runtime and Windows App SDK travel inside.</li>
                 <li>No account, no card, no trial clock.</li>
               </ul>
               <p className="m-0 border-t border-white/10 pt-4 text-[13px] leading-relaxed text-muted">

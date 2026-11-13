@@ -99,7 +99,7 @@ export default function LicencePage() {
             <tr>
               <td>Windows App SDK · WinUI 3</td>
               <td>MIT</td>
-              <td>Microsoft. Shipped inside the MSIX package.</td>
+              <td>Microsoft. Shipped inside the installer.</td>
             </tr>
             <tr>
               <td>.NET 8 runtime</td>
