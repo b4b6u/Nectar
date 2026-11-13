@@ -43,7 +43,7 @@ npm run build   # static pages plus the feed route
 npm test        # tsc + node --test
 ```
 
-Production is <https://nectar-chi-eight.vercel.app>, deployed from the Vercel project `nectar`, whose
+Production is <https://nectarnotch.vercel.app>, deployed from the Vercel project `nectar`, whose
 **Root Directory** is `web` — so a push to `main` deploys the site and there is no build step at the
 repository root. `NECTAR_GITHUB_REPO=b4b6u/Nectar` is set for the `/download/windows` route and the
 MSIX feed. Without a Root Directory of `web`, a Git-connected project builds the repository root and
