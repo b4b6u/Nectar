@@ -1592,7 +1592,7 @@
                             <Border Height="1" Background="{StaticResource NectarInkFaintBrush}" Opacity="0.25" />
                             <Grid>
                                 <TextBlock Style="{StaticResource SettingsHeaderTextStyle}" Text="Permissions &amp; updates" />
-                                <TextBlock HorizontalAlignment="Right" Style="{StaticResource CardMetaTextStyle}" Text="v2" />
+                                <TextBlock HorizontalAlignment="Right" Style="{StaticResource CardMetaTextStyle}" Text="v1" />
                             </Grid>
                             <StackPanel Orientation="Horizontal" Spacing="10">
                                 <TextBlock Style="{StaticResource SettingHintTextStyle}" Text="{x:Bind ViewModel.CalendarState, Mode=OneWay}" />

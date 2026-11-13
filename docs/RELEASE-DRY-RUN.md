@@ -40,7 +40,7 @@ Import-Certificate -FilePath .\Nectar.cer -CertStoreLocation Cert:\LocalMachine\
 ## 3. Install it like a user would
 
 ```powershell
-Add-AppxPackage -Path .\dist\Nectar-2.0.0-x64.msix
+Add-AppxPackage -Path .\dist\Nectar-1.0.0-x64.msix
 Start-Process explorer.exe "shell:AppsFolder\$((Get-AppxPackage Nectar.Desktop).PackageFamilyName)!Nectar"
 ```
 

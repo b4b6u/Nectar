@@ -13,7 +13,7 @@ export default function SiteHeader() {
         </span>
         <span className="font-mono text-xs tracking-[0.22em]">NECTAR</span>
         <span className="rounded-full bg-nectar px-1.5 py-0.5 font-mono text-[10px] text-[#201109]">
-          v2
+          v1
         </span>
       </Link>
 

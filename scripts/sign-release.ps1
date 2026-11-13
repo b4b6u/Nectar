@@ -38,7 +38,7 @@ param(
     [string]$Thumbprint,
 
     [string]$TimestampUrl = 'http://timestamp.digicert.com',
-    [string]$Version = '2.0.0',
+    [string]$Version = '1.0.0',
     [switch]$AllowUntrusted,
     [switch]$Zip
 )
