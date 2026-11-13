@@ -57,7 +57,10 @@ const nextConfig = {
     return [
       // Pretty entry point. 307, not 308: the route may move, and browsers cache 308s forever.
       { source: "/download", destination: "/api/download/appinstaller", permanent: false },
-      { source: "/download/appinstaller", destination: "/api/download/appinstaller", permanent: false }
+      { source: "/download/appinstaller", destination: "/api/download/appinstaller", permanent: false },
+      // The legal pages used to be loose HTML in /public. Permanent: the new paths are the site.
+      { source: "/privacy.html", destination: "/privacy", permanent: true },
+      { source: "/licence.html", destination: "/licence", permanent: true }
     ];
   },
 

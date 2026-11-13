@@ -5,7 +5,7 @@ import type { Config } from "tailwindcss";
  * as the same product: sage Tasks, lavender Focus, mustard Notepad, steel-blue Events.
  */
 const config: Config = {
-  content: ["./app/**/*.{ts,tsx}"],
+  content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {

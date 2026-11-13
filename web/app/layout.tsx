@@ -5,18 +5,26 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://nectar.app"),
   title: "Nectar — your day, perfectly anchored",
   description:
-    "A top-anchored workspace for Windows: tasks, a focus timer, a scratchpad and today's calendar drop out of the notch. $9 a year.",
+    "A top-anchored workspace for Windows: tasks, a focus timer, a scratchpad and today's calendar drop out of the notch. Free.",
   openGraph: {
     title: "Nectar — your day, perfectly anchored",
     description:
       "Tasks, focus timer, notepad and calendar in a Windows overlay that never steals focus.",
     url: "https://nectar.app",
     siteName: "Nectar",
-    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Nectar for Windows" }],
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Nectar for Windows" }],
     type: "website"
   },
-  twitter: { card: "summary_large_image" },
-  icons: { icon: "/favicon.ico", apple: "/apple-touch-icon.png" }
+  twitter: { card: "summary_large_image", images: ["/og-image.png"] },
+  manifest: "/manifest.webmanifest",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "48x48" },
+      { url: "/favicon-32x32.png", type: "image/png", sizes: "32x32" },
+      { url: "/favicon-16x16.png", type: "image/png", sizes: "16x16" }
+    ],
+    apple: { url: "/apple-touch-icon.png", sizes: "180x180" }
+  }
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
