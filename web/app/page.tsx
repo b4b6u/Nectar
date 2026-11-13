@@ -1,14 +1,14 @@
 /**
- * The one landing page. Everything the standalone static site used to say — the workspace tour, the
- * three ways in, calendar, customize, insights, the local-first facts and the install steps — lives
- * here now, in the same design as /download-steps, /privacy and /licence.
+ * The landing page. Everything the site says about the app — the workspace tour, the three ways in,
+ * calendar, customize, insights, the local-first facts and the install steps — set in the poster
+ * language: cream stock, green ink, one loud orange, pastel cut-out cards and display type.
  */
 
 import Image from "next/image";
 import SiteFooter from "../components/SiteFooter";
 import SiteHeader from "../components/SiteHeader";
 
-const SITE_URL = "https://nectar.app";
+const SITE_URL = "https://nectarnotch.vercel.app";
 
 /** Same SoftwareApplication block the standalone page carried, minus the placeholder repo link. */
 const STRUCTURED_DATA = {
@@ -48,30 +48,45 @@ const STRUCTURED_DATA = {
   ]
 };
 
+/** The ticker under the hero: the promises, set as a strip of stamps. */
+const TICKER = [
+  "Alt + N opens the notch",
+  "No account",
+  "No telemetry",
+  "No server",
+  "No Electron",
+  "No web view",
+  "C# · .NET 8 · WinUI 3"
+] as const;
+
 const FEATURES = [
   {
     title: "Tasks",
     copy: "Type a line, press Enter. The ring on the left completes it, completed rows sink to the bottom, and every check-off feeds the weekly chart.",
     points: ["One-line capture", "Strikethrough, then re-sort", "Cleared tasks keep their date"],
-    dot: "#8DBA98"
+    fill: "#b8cd49",
+    rotate: "-1.2deg"
   },
   {
     title: "Focus timer",
     copy: "A 25-minute countdown derived from a deadline, not from ticks — a busy machine cannot make it drift. Sleeping the PC pauses it.",
     points: ["5 / 10 / 15 min extend chips", "Pauses on suspend", "Bird call at 00:00"],
-    dot: "#A39CD0"
+    fill: "#c9c2ea",
+    rotate: "0.9deg"
   },
   {
     title: "Notepad",
     copy: "A scratch page with no title, no file and no save button. It writes itself 700 ms after you stop typing.",
     points: ["Word count and save state", "Ctrl + Enter lifts a line into Tasks", "Saves on quit"],
-    dot: "#D2CA72"
+    fill: "#ffcf4a",
+    rotate: "-0.7deg"
   },
   {
     title: "Calendar",
     copy: "Today's events, one row each, each with a bell. Link Google or Microsoft — one at a time, from your own OAuth client.",
     points: ["Today only, on purpose", "Reminders at the start or before", "Snooze 5 min, or Okay"],
-    dot: "#8CB1CD"
+    fill: "#f5b6bf",
+    rotate: "1.1deg"
   }
 ] as const;
 
@@ -111,6 +126,17 @@ const FACTS = [
   }
 ] as const;
 
+/** A small tracked label — the editorial standing head over a headline. */
+function Kicker({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return (
+    <p
+      className={`m-0 text-[10.5px] font-bold uppercase tracking-[0.24em] ${className}`}
+    >
+      {children}
+    </p>
+  );
+}
+
 /** A titled text column beside a screenshot; `flip` puts the shot on the left for the rhythm. */
 function SplitSection({
   id,
@@ -118,7 +144,8 @@ function SplitSection({
   title,
   paragraphs,
   children,
-  flip = false
+  flip = false,
+  caption
 }: {
   id: string;
   eyebrow: string;
@@ -126,22 +153,32 @@ function SplitSection({
   paragraphs: readonly string[];
   children: React.ReactNode;
   flip?: boolean;
+  caption?: React.ReactNode;
 }) {
   return (
     <section
       id={id}
-      className="mx-auto grid max-w-shell scroll-mt-16 items-center gap-10 px-6 py-16 lg:grid-cols-2 lg:gap-16"
+      className="mx-auto grid max-w-shell scroll-mt-24 items-center gap-10 px-5 py-16 sm:px-6 lg:grid-cols-2 lg:gap-16"
     >
       <div className={flip ? "lg:order-2" : undefined}>
-        <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-nectar">{eyebrow}</p>
-        <h2 className="font-display text-3xl font-semibold leading-tight sm:text-4xl">{title}</h2>
+        <Kicker className="mb-4 inline-block rotate-[-1.5deg] border-2 border-ink bg-sun px-2.5 py-1">
+          {eyebrow}
+        </Kicker>
+        <h2 className="m-0 font-display text-[clamp(2rem,4.6vw,3.4rem)] uppercase leading-[0.9]">
+          {title}
+        </h2>
         {paragraphs.map((paragraph) => (
-          <p key={paragraph} className="mt-4 text-[15px] leading-relaxed text-muted">
+          <p key={paragraph} className="mt-4 text-[15.5px] leading-relaxed text-muted">
             {paragraph}
           </p>
         ))}
       </div>
-      <div className={flip ? "lg:order-1" : undefined}>{children}</div>
+      <figure className={flip ? "m-0 lg:order-1" : "m-0"}>{children}</figure>
+      {caption ? (
+        <figcaption className="order-last text-[12px] uppercase tracking-[0.14em] text-muted lg:col-span-2">
+          {caption}
+        </figcaption>
+      ) : null}
     </section>
   );
 }
@@ -157,46 +194,49 @@ export default function Home() {
 
       <main>
         {/* Hero */}
-        <section className="mx-auto max-w-shell px-6 pb-16 pt-10 text-center sm:pt-16">
-          <p className="mb-7 font-mono text-[11px] uppercase tracking-[0.18em] text-nectar">
-            Windows 10 &amp; 11 · WinUI 3 · Free
-          </p>
-          <h1 className="mx-auto max-w-4xl font-display text-hero font-bold">
-            Your day,{" "}
-            <em className="font-medium not-italic text-nectar">perfectly anchored.</em>
-          </h1>
-          <p className="mx-auto mt-7 max-w-xl text-lg text-muted">
-            Nectar hangs off the top edge of your screen. Pull it down and your tasks, a focus
-            timer, a scratchpad and today&apos;s calendar are already open — without stealing focus
-            from the app you are working in.
-          </p>
+        <section className="relative overflow-hidden px-5 pb-10 pt-12 sm:px-6 sm:pt-16">
+          <div className="mx-auto max-w-shell text-center">
+            <Kicker className="text-ink/70">Windows 10 &amp; 11 &middot; WinUI 3 &middot; Free</Kicker>
 
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-            <a
-              className="rounded-full bg-nectar px-7 py-3.5 text-[15px] font-semibold text-[#201109] shadow-[0_14px_40px_-18px_rgba(247,154,99,0.9)] transition hover:-translate-y-px hover:bg-[#ffa970]"
-              href="/download-steps"
-            >
-              Download Nectar — free
-            </a>
-            <a
-              className="rounded-full border border-white/10 px-7 py-3.5 text-[15px] font-semibold text-cream transition hover:border-white/30"
-              href="#workspace"
-            >
-              See what&apos;s inside
-            </a>
+            <h1 className="mx-auto mt-6 max-w-5xl font-display text-hero uppercase">
+              <span className="display-shadow -rotate-1 inline-block text-orange">Your day,</span>{" "}
+              <span className="display-shadow inline-block">perfectly</span>{" "}
+              <span className="display-shadow rotate-1 inline-block">anchored.</span>
+            </h1>
+
+            <p className="mx-auto mt-8 max-w-xl text-[17px] leading-relaxed text-inkSoft">
+              Nectar hangs off the top edge of your screen. Pull it down and your tasks, a focus
+              timer, a scratchpad and today&rsquo;s calendar are already open — without stealing
+              focus from the app you are working in.
+            </p>
+
+            <div className="mt-9 flex flex-wrap items-center justify-center gap-4">
+              <a
+                className="rounded-full border-2 border-ink bg-orange px-7 py-3 text-[12px] font-bold uppercase tracking-[0.16em] text-paper shadow-sticker transition-transform hover:-translate-y-0.5 hover:bg-red"
+                href="/download-steps"
+              >
+                Download Nectar &mdash; free
+              </a>
+              <a
+                className="rounded-full border-2 border-ink bg-paper px-7 py-3 text-[12px] font-bold uppercase tracking-[0.16em] text-ink transition-transform hover:-translate-y-0.5 hover:bg-sun"
+                href="#workspace"
+              >
+                See what&rsquo;s inside
+              </a>
+            </div>
+
+            <p className="mt-6 text-[11px] font-medium uppercase tracking-[0.18em] text-muted">
+              Free to use &middot; Unlimited updates &middot; No account
+            </p>
           </div>
 
-          <p className="mt-5 font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
-            Free to use · Unlimited updates · No account
-          </p>
-
-          {/* The overlay itself, with its collapsed pill on top */}
-          <figure className="mx-auto mt-16 max-w-[1000px]">
-            <div className="overflow-hidden rounded-2xl border border-white/10 bg-shell shadow-[0_50px_140px_-50px_rgba(0,0,0,0.95)]">
-              <div className="flex items-center gap-2.5 border-b border-white/10 px-4 py-2.5 text-[11px]">
-                <span className="h-2 w-2 rounded-full bg-nectar" />
-                <span className="font-mono tracking-[0.18em]">NECTAR</span>
-                <span className="ml-auto font-mono text-muted">25:00</span>
+          {/* The overlay itself, in a cut-out frame */}
+          <figure className="relative mx-auto mt-14 max-w-[1000px]">
+            <div className="sticker-card overflow-hidden bg-ink shadow-stickerLg">
+              <div className="flex items-center gap-2.5 border-b-2 border-ink bg-paper px-4 py-2.5 text-[10.5px] font-bold uppercase tracking-[0.18em]">
+                <span className="h-2.5 w-2.5 rounded-full border border-ink bg-orange" />
+                <span>Nectar</span>
+                <span className="ml-auto font-mono text-[11px] tracking-normal">25:00</span>
               </div>
               <Image
                 alt="The Nectar workspace open on Windows: four pastel cards for tasks, focus timer, notepad and events, with Insights and Customize tabs in the header."
@@ -207,102 +247,119 @@ export default function Home() {
                 width={1000}
               />
             </div>
-            <figcaption className="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
-              <span className="inline-flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-sage" /> Tasks
-              </span>
-              <span className="inline-flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-lavender" /> Focus
-              </span>
-              <span className="inline-flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-mustard" /> Notepad
-              </span>
-              <span className="inline-flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-steel" /> Events
+            <figcaption className="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[10.5px] font-bold uppercase tracking-[0.16em] text-muted">
+              <span>Fig. 01 &mdash; the workspace, 1000 &times; 340 px</span>
+              <span aria-hidden className="text-orange">
+                &darr;&darr;&darr;
               </span>
             </figcaption>
           </figure>
         </section>
 
-        {/* The workspace */}
-        <section id="workspace" className="mx-auto max-w-shell scroll-mt-16 px-6 py-20">
-          <div className="mx-auto mb-14 max-w-xl text-center">
-            <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-nectar">
-              The workspace
-            </p>
-            <h2 className="font-display text-4xl font-semibold sm:text-5xl">
-              Four cards. Nothing to arrange.
-            </h2>
-            <p className="mt-5 text-[15px] leading-relaxed text-muted">
-              They arrive in one 1000 px strip that never covers the app underneath. Hide the ones
-              you do not use, drag them into your own order.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 gap-px overflow-hidden rounded-3xl sm:grid-cols-2 lg:grid-cols-4">
-            {FEATURES.map((feature) => (
-              <article
-                key={feature.title}
-                className="group relative bg-[#0b0b0e] p-8 transition-colors duration-300 hover:bg-[#101014]"
+        {/* Ticker */}
+        <div className="overflow-hidden border-y-2 border-ink bg-leaf py-2.5">
+          <div className="marquee">
+            {[0, 1].map((copy) => (
+              <div
+                key={copy}
+                aria-hidden={copy === 1}
+                className="flex shrink-0 items-center whitespace-nowrap text-[12px] font-bold uppercase tracking-[0.2em]"
               >
-                <span
-                  aria-hidden
-                  className="absolute inset-x-0 top-0 h-px"
-                  style={{ backgroundColor: feature.dot, opacity: 0.85 }}
-                />
-                <span
-                  aria-hidden
-                  className="mb-6 block h-2.5 w-2.5 rounded-full"
-                  style={{ backgroundColor: feature.dot }}
-                />
-                <h3 className="mb-3 font-display text-xl font-semibold">{feature.title}</h3>
-                <p className="text-[14.5px] leading-relaxed text-muted">{feature.copy}</p>
-                <ul className="mt-5 list-none space-y-2 border-t border-white/[0.07] p-0 pt-4 text-[13px] text-muted">
-                  {feature.points.map((point) => (
-                    <li key={point} className="flex gap-2">
-                      <span aria-hidden style={{ color: feature.dot }}>
-                        ·
-                      </span>
-                      {point}
-                    </li>
-                  ))}
-                </ul>
-              </article>
+                {TICKER.map((item) => (
+                  <span key={item} className="flex items-center">
+                    <span className="px-5">{item}</span>
+                    <span className="text-orange">&hearts;</span>
+                  </span>
+                ))}
+              </div>
             ))}
           </div>
+        </div>
 
-          <p className="mt-10 text-center font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
-            Local-first · No account · Your calendar tokens never leave the PC
-          </p>
+        {/* The workspace — the loud orange scene */}
+        <section id="workspace" className="scroll-mt-24 bg-orange px-5 py-20 text-paper sm:px-6">
+          <div className="mx-auto max-w-shell">
+            <div className="mx-auto max-w-2xl text-center">
+              <Kicker className="text-paper/80">Vol. 01 / The workspace</Kicker>
+              <h2 className="mt-5 font-display text-scene uppercase">
+                <span className="display-shadow inline-block -rotate-1">Four cards.</span>{" "}
+                <span className="display-shadow inline-block">Nothing</span>{" "}
+                <span className="display-shadow inline-block rotate-1">to arrange.</span>
+              </h2>
+              <p className="mx-auto mt-6 max-w-lg text-[16px] leading-relaxed text-paper/90">
+                They arrive in one 1000 px strip that never covers the app underneath. Hide the ones
+                you do not use, drag them into your own order.
+              </p>
+            </div>
+
+            <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {FEATURES.map((feature, index) => (
+                <article
+                  key={feature.title}
+                  className="sticker-card flex flex-col p-6 text-ink transition-transform duration-200 hover:-translate-y-1"
+                  style={{ backgroundColor: feature.fill, transform: `rotate(${feature.rotate})` }}
+                >
+                  <span className="font-mono text-[11px] tracking-[0.1em] opacity-60">
+                    0{index + 1}
+                  </span>
+                  <h3 className="mt-3 font-display text-[30px] uppercase leading-none">
+                    {feature.title}
+                  </h3>
+                  <p className="mt-3 text-[13.5px] leading-relaxed">{feature.copy}</p>
+                  <ul className="mt-4 list-none space-y-1.5 border-t-2 border-ink/25 p-0 pt-3 text-[12.5px]">
+                    {feature.points.map((point) => (
+                      <li key={point} className="flex gap-2">
+                        <span aria-hidden className="text-ink/60">
+                          &rarr;
+                        </span>
+                        {point}
+                      </li>
+                    ))}
+                  </ul>
+                </article>
+              ))}
+            </div>
+
+            <p className="mt-12 text-center text-[11px] font-bold uppercase tracking-[0.2em] text-paper/80">
+              Local-first &middot; No account &middot; Your calendar tokens never leave the PC
+            </p>
+          </div>
         </section>
 
         {/* Three ways in */}
-        <section className="mx-auto max-w-shell px-6 py-16">
-          <div className="max-w-2xl">
-            <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-nectar">
-              Getting in
-            </p>
-            <h2 className="font-display text-3xl font-semibold leading-tight sm:text-4xl">
-              Three ways in. Pick one.
-            </h2>
-            <p className="mt-5 text-[15px] leading-relaxed text-muted">
-              The overlay is deliberately non-activating: clicking a card never moves your keyboard
-              focus out of the editor you are in. Only a text field asks for it, and only when you
-              click.
-            </p>
-          </div>
+        <section className="px-5 py-20 sm:px-6">
+          <div className="mx-auto max-w-shell">
+            <div className="max-w-2xl">
+              <Kicker className="mb-4 inline-block rotate-[-1.5deg] border-2 border-ink bg-blush px-2.5 py-1">
+                Getting in
+              </Kicker>
+              <h2 className="font-display text-shout uppercase leading-[0.9]">
+                Three ways in. Pick one.
+              </h2>
+              <p className="mt-5 text-[15.5px] leading-relaxed text-muted">
+                The overlay is deliberately non-activating: clicking a card never moves your keyboard
+                focus out of the editor you are in. Only a text field asks for it, and only when you
+                click.
+              </p>
+            </div>
 
-          <ol className="mt-10 grid list-none grid-cols-1 gap-px overflow-hidden rounded-3xl p-0 sm:grid-cols-3">
-            {ENTRIES.map((entry) => (
-              <li key={entry.key} className="bg-[#0b0b0e] p-7">
-                <span className="mb-5 inline-block rounded-full border border-white/15 px-3 py-1 font-mono text-[11px] text-nectar">
-                  {entry.key}
-                </span>
-                <h3 className="mb-2 font-display text-lg font-semibold">{entry.title}</h3>
-                <p className="m-0 text-sm leading-relaxed text-muted">{entry.copy}</p>
-              </li>
-            ))}
-          </ol>
+            <ol className="mt-10 grid list-none grid-cols-1 gap-6 p-0 sm:grid-cols-3">
+              {ENTRIES.map((entry, index) => (
+                <li key={entry.key} className="sticker-card bg-paper p-6">
+                  <span className="rounded-full border-2 border-ink bg-sun px-3 py-1 font-mono text-[11px]">
+                    {entry.key}
+                  </span>
+                  <h3 className="mt-4 font-display text-[26px] uppercase leading-none">
+                    {entry.title}
+                  </h3>
+                  <p className="m-0 mt-2.5 text-[13.5px] leading-relaxed text-muted">{entry.copy}</p>
+                  <span className="mt-4 block text-[11px] font-bold uppercase tracking-[0.18em] text-ink/40">
+                    0{index + 1}
+                  </span>
+                </li>
+              ))}
+            </ol>
+          </div>
         </section>
 
         {/* Calendar */}
@@ -314,8 +371,9 @@ export default function Home() {
             "Link Google Calendar or Microsoft Calendar through OAuth with PKCE. Tokens are encrypted with DPAPI for your Windows user and never leave the machine; only the public client ID and tenant are written to settings.",
             "Ring the bell on an event — at the start, 5 or 10 minutes before. When it comes due, the same tray that ends a focus session drops down: the hummingbird, the event, the time, and two buttons."
           ]}
+          caption="Snooze pushes it five minutes out. Okay dismisses it. Esc counts as Okay."
         >
-          <figure className="m-0 rounded-2xl border border-white/10 bg-[#0b0b0e] p-6">
+          <div className="sticker-card bg-paperDeep p-6">
             <Image
               alt="The Nectar reminder tray: hummingbird mark, event title, a muted Reminder line, and two pills — Snooze 5 min and Okay."
               className="h-auto w-full"
@@ -323,10 +381,7 @@ export default function Home() {
               src="/docs/nectar-reminder.png"
               width={560}
             />
-            <figcaption className="mt-5 text-[13px] leading-relaxed text-muted">
-              Snooze pushes it five minutes out. Okay dismisses it. <kbd>Esc</kbd> counts as Okay.
-            </figcaption>
-          </figure>
+          </div>
         </SplitSection>
 
         {/* Customize */}
@@ -339,21 +394,21 @@ export default function Home() {
             "General holds the shortcut, the hover band, the pill switch and the calendar. Focus holds the session length, the completion sound, the chime volume and the expiry tray. Workspace holds card order and visibility.",
             "Reset restores the layout and the focus defaults — your shortcut, your hover setting and your calendar link stay exactly where they were."
           ]}
+          caption={
+            <>
+              Three cards, one file: everything lands in <code className="font-mono">settings.json</code>.
+            </>
+          }
         >
-          <figure className="m-0">
-            <div className="overflow-hidden rounded-2xl border border-white/10 bg-shell">
-              <Image
-                alt="Nectar's Customize view: a mint General card with shortcut, pill and calendar controls, a lilac Focus card, and a sky card for card order and visibility."
-                className="h-auto w-full"
-                height={480}
-                src="/docs/nectar-customize.png"
-                width={1000}
-              />
-            </div>
-            <figcaption className="mt-5 text-[13px] leading-relaxed text-muted">
-              Three cards, one file: everything lands in <code>settings.json</code>.
-            </figcaption>
-          </figure>
+          <div className="sticker-card overflow-hidden bg-ink">
+            <Image
+              alt="Nectar's Customize view: a mint General card with shortcut, pill and calendar controls, a lilac Focus card, and a sky card for card order and visibility."
+              className="h-auto w-full"
+              height={480}
+              src="/docs/nectar-customize.png"
+              width={1000}
+            />
+          </div>
         </SplitSection>
 
         {/* Insights */}
@@ -365,117 +420,109 @@ export default function Home() {
             "The week you just had, beside the week before it: tasks completed or minutes focused, whichever you are in the mood to face. Every bar is drawn natively from the same SQLite file the cards write to — no charting library, no cloud round trip.",
             "If nothing has been logged yet, it says so instead of drawing an empty chart."
           ]}
+          caption="Hover a column for the day's numbers."
         >
-          <figure className="m-0">
-            <div className="overflow-hidden rounded-2xl border border-white/10 bg-shell">
-              <Image
-                alt="The Insights tab: a sage momentum card with the week's headline and count, beside a lilac bar chart of the last seven days."
-                className="h-auto w-full"
-                height={450}
-                src="/docs/nectar-insights.png"
-                width={1000}
-              />
-            </div>
-            <figcaption className="mt-5 text-[13px] leading-relaxed text-muted">
-              Hover a column for the day&apos;s numbers.
-            </figcaption>
-          </figure>
+          <div className="sticker-card overflow-hidden bg-ink">
+            <Image
+              alt="The Insights tab: a sage momentum card with the week's headline and count, beside a lilac bar chart of the last seven days."
+              className="h-auto w-full"
+              height={450}
+              src="/docs/nectar-insights.png"
+              width={1000}
+            />
+          </div>
         </SplitSection>
 
         {/* Local first */}
-        <section className="mx-auto max-w-shell px-6 py-16">
-          <div className="mx-auto max-w-2xl text-center">
-            <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-nectar">
-              Where your data lives
+        <section className="border-y-2 border-ink bg-paperDeep px-5 py-20 sm:px-6">
+          <div className="mx-auto max-w-shell">
+            <div className="mx-auto max-w-2xl text-center">
+              <Kicker className="text-ink/60">Where your data lives</Kicker>
+              <h2 className="mt-5 font-display text-shout uppercase leading-[0.9]">
+                On this PC. That is the whole story.
+              </h2>
+            </div>
+
+            <dl className="m-0 mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3">
+              {FACTS.map((fact, index) => (
+                <div
+                  key={fact.title}
+                  className="sticker-card bg-paper p-6"
+                  style={{ transform: `rotate(${index === 1 ? "0.8deg" : "-0.7deg"})` }}
+                >
+                  <dt className="font-display text-[44px] uppercase leading-none text-orange">
+                    {fact.value}
+                  </dt>
+                  <dd className="m-0 mt-2 font-display text-[24px] uppercase leading-none">
+                    {fact.title}
+                  </dd>
+                  <p className="m-0 mt-3 text-[13.5px] leading-relaxed text-muted">{fact.copy}</p>
+                </div>
+              ))}
+            </dl>
+
+            <p className="mt-10 text-center text-[11px] font-bold uppercase tracking-[0.18em] text-muted">
+              No telemetry &middot; no analytics &middot; no Electron runtime — a WinUI 3 app with a
+              Win32 overlay layer
             </p>
-            <h2 className="font-display text-3xl font-semibold leading-tight sm:text-4xl">
-              On this PC. That is the whole story.
-            </h2>
           </div>
-
-          <dl className="m-0 mt-12 grid grid-cols-1 gap-px overflow-hidden rounded-3xl sm:grid-cols-3">
-            {FACTS.map((fact) => (
-              <div key={fact.title} className="bg-[#0b0b0e] p-8">
-                <dt className="font-display text-3xl font-semibold text-nectar">{fact.value}</dt>
-                <dd className="m-0 mt-3 font-display text-lg font-semibold">{fact.title}</dd>
-                <p className="m-0 mt-2 text-[13.5px] leading-relaxed text-muted">{fact.copy}</p>
-              </div>
-            ))}
-          </dl>
-
-          <p className="mt-10 text-center font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
-            No telemetry · no analytics · no Electron runtime — a WinUI 3 app with a Win32 overlay
-            layer
-          </p>
         </section>
 
         {/* Install */}
-        <section
-          id="install"
-          className="mx-auto max-w-shell scroll-mt-16 px-6 pb-28 pt-10"
-        >
-          <div className="grid gap-10 rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.05] to-transparent p-8 sm:p-12 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
+        <section id="install" className="scroll-mt-24 bg-ink px-5 py-20 text-paper sm:px-6">
+          <div className="mx-auto grid max-w-shell gap-10 lg:grid-cols-[1.05fr_1fr] lg:gap-14">
             <div>
-              <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-nectar">
+              <Kicker className="inline-block rotate-[-1.5deg] border-2 border-paper bg-orange px-2.5 py-1 text-paper">
                 Install
-              </p>
-              <h2 className="font-display text-3xl font-semibold leading-tight sm:text-4xl">
+              </Kicker>
+              <h2 className="mt-5 font-display text-shout uppercase leading-[0.9] text-paper">
                 Download it, run it, pin it.
               </h2>
-              <p className="mt-5 text-[15px] leading-relaxed text-muted">
+              <p className="mt-5 text-[15.5px] leading-relaxed text-paper/80">
                 One setup file and nothing to hunt down: Nectar brings its own .NET runtime and
                 Windows App SDK. It installs for your Windows user, so there is no administrator
                 prompt — Windows only asks once whether you trust the file;{" "}
-                <a className="text-cream underline decoration-white/30 underline-offset-4" href="/download-steps">
+                <a className="text-sun underline decoration-sun/40 underline-offset-4" href="/download-steps">
                   here is exactly what to click
                 </a>
                 .
               </p>
 
-              <ol className="mt-7 list-none space-y-3 p-0 text-[15px] text-muted">
-                <li className="flex gap-3">
-                  <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full border border-white/15 font-mono text-[11px] text-nectar">
-                    1
-                  </span>
-                  Download <code className="font-mono text-[13px] text-cream/90">Nectar-Setup</code>{" "}
-                  and run it.
-                </li>
-                <li className="flex gap-3">
-                  <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full border border-white/15 font-mono text-[11px] text-nectar">
-                    2
-                  </span>
-                  More info, then Run anyway — the SmartScreen prompt, explained.
-                </li>
-                <li className="flex gap-3">
-                  <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full border border-white/15 font-mono text-[11px] text-nectar">
-                    3
-                  </span>
-                  Press Alt + N. It starts hidden in the notch, and a desktop shortcut is waiting.
-                </li>
+              <ol className="mt-8 grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-3">
+                {[
+                  "Download Nectar-Setup and run it.",
+                  "More info, then Run anyway — the SmartScreen prompt, explained.",
+                  "Press Alt + N. It starts hidden in the notch."
+                ].map((step, index) => (
+                  <li key={step} className="border-t-2 border-paper/25 pt-3 text-[13px] leading-relaxed text-paper/80">
+                    <span className="block font-display text-[32px] uppercase leading-none text-leaf">
+                      0{index + 1}
+                    </span>
+                    <span className="mt-2 block">{step}</span>
+                  </li>
+                ))}
               </ol>
 
               <a
-                className="mt-9 inline-block rounded-full bg-nectar px-8 py-3.5 text-[15px] font-semibold text-[#201109] transition hover:-translate-y-px hover:bg-[#ffa970]"
+                className="mt-9 inline-block rounded-full border-2 border-paper bg-orange px-8 py-3.5 text-[12px] font-bold uppercase tracking-[0.16em] text-paper shadow-[4px_4px_0_#fff2d6] transition-transform hover:-translate-y-0.5 hover:bg-red"
                 href="/download-steps"
               >
                 Install on Windows
               </a>
             </div>
 
-            <div className="flex flex-col justify-center gap-4 rounded-2xl border border-white/10 bg-black/40 p-7">
-              <p className="m-0 font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
-                What you need
-              </p>
-              <ul className="m-0 list-none space-y-3 p-0 text-[14px] leading-relaxed text-muted">
+            <div className="rounded-sticker border-2 border-paper/30 bg-inkSoft p-6">
+              <Kicker className="text-paper/60">What you need</Kicker>
+              <ul className="mt-4 list-none space-y-3 p-0 text-[14px] leading-relaxed text-paper/85">
                 <li>Windows 10 build 19041 or later, or Windows 11.</li>
                 <li>A ~70 MB download, about 280 MB once installed.</li>
                 <li>No administrator rights — it installs to your user folder.</li>
                 <li>Nothing else — the .NET runtime and Windows App SDK travel inside.</li>
                 <li>No account, no card, no trial clock.</li>
               </ul>
-              <p className="m-0 border-t border-white/10 pt-4 text-[13px] leading-relaxed text-muted">
+              <p className="m-0 mt-5 border-t-2 border-paper/20 pt-4 text-[13px] leading-relaxed text-paper/70">
                 Prefer to build it yourself? The source needs the .NET 8 SDK:{" "}
-                <code className="font-mono text-[12.5px] text-cream/90">
+                <code className="mt-2 block overflow-x-auto rounded bg-black/40 px-3 py-2 font-mono text-[12px] text-paper/90">
                   dotnet build Nectar/Nectar.csproj -c Release
                 </code>
               </p>

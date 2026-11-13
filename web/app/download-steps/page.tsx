@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import SiteFooter from "../../components/SiteFooter";
 import SiteHeader from "../../components/SiteHeader";
 
 export const metadata: Metadata = {
@@ -17,17 +18,17 @@ const DOWNLOAD_URL = "https://github.com/b4b6u/Nectar/releases/latest/download/N
 
 const STEPS = [
   {
-    number: "1",
+    number: "01",
     title: "Download the installer",
     copy: "One file, Nectar-Setup. Your browser may ask you to keep the download first — the same check, one step earlier. It installs for your Windows user only, so there is no administrator prompt."
   },
   {
-    number: "2",
+    number: "02",
     title: "Click “More info”",
     copy: "The blue Windows prompt hides its details behind that link — including who signed the file. Clicking it is not agreeing to anything; it only reveals the buttons below."
   },
   {
-    number: "3",
+    number: "03",
     title: "Click “Run anyway”",
     copy: "That is the only way past a Windows prompt for an app Microsoft has not seen before. Nectar installs, and the prompt never appears again."
   }
@@ -51,6 +52,42 @@ const QUESTIONS = [
   }
 ] as const;
 
+const CHECKS = [
+  {
+    label: "Publisher",
+    body: (
+      <>
+        Today it will say <em className="not-italic">Unknown publisher</em>: this build is not
+        code-signed yet, and signing certificates cost money we have not spent. Expected — but the
+        line should never show another company&rsquo;s name.
+      </>
+    ),
+    after: (
+      <>
+        When a certificate is added it will read{" "}
+        <strong className="font-bold">Nectar</strong>. Until then the checksum below is the check
+        that does not depend on reputation.
+      </>
+    )
+  },
+  {
+    label: "Address",
+    body: (
+      <>
+        The download starts on this site and hands you to{" "}
+        <strong className="font-bold">github.com/b4b6u/Nectar</strong>, the repository&rsquo;s own
+        release page. If a link in an email or a chat window sends you anywhere else, close it and
+        come back here.
+      </>
+    )
+  },
+  {
+    label: "Checksum",
+    body: <>Every release publishes a SHA-256 beside the file. Compare yours with that line:</>,
+    command: "Get-FileHash .\\Nectar-Setup.exe"
+  }
+] as const;
+
 /** A calm, faithful sketch of the Windows SmartScreen dialog — greys from the OS, not the site. */
 function SmartScreenMock({
   state,
@@ -63,7 +100,7 @@ function SmartScreenMock({
     <figure className="m-0 flex h-full flex-col">
       <div
         aria-hidden
-        className="rounded-xl border border-black/10 bg-[#f3f3f3] p-5 text-[#1b1b1b] shadow-[0_30px_80px_-40px_rgba(0,0,0,0.85)] sm:p-6"
+        className="rounded-md border border-black/15 bg-[#f3f3f3] p-5 text-[#1b1b1b] shadow-lift sm:p-6"
         style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
       >
         <div className="flex items-start gap-4">
@@ -111,7 +148,7 @@ function SmartScreenMock({
                   Run anyway
                   <span
                     aria-hidden
-                    className="absolute -inset-2 rounded-[6px] ring-2 ring-nectar ring-offset-2 ring-offset-[#f3f3f3]"
+                    className="absolute -inset-2 rounded-[6px] ring-[3px] ring-orange ring-offset-2 ring-offset-[#f3f3f3]"
                   />
                 </span>
               )}
@@ -120,7 +157,7 @@ function SmartScreenMock({
         </div>
       </div>
 
-      <figcaption className="mt-auto pt-5 font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
+      <figcaption className="mt-auto pt-5 text-[10.5px] font-bold uppercase tracking-[0.18em] text-muted">
         {label}
       </figcaption>
     </figure>
@@ -132,17 +169,18 @@ export default function DownloadStepsPage() {
     <div className="relative z-10">
       <SiteHeader />
 
-      <main className="mx-auto max-w-shell px-6 pb-28">
-        <section className="mx-auto max-w-2xl pt-10 text-center sm:pt-16">
-          <p className="mb-6 font-mono text-[11px] uppercase tracking-[0.18em] text-nectar">
+      <main className="mx-auto max-w-shell px-5 pb-24 sm:px-6">
+        <section className="mx-auto max-w-3xl pt-12 text-center sm:pt-16">
+          <p className="mb-6 inline-block rotate-[-1.5deg] border-2 border-ink bg-blush px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.24em]">
             Before you install
           </p>
-          <h1 className="font-display text-4xl font-semibold leading-[1.05] sm:text-6xl">
-            Windows will ask once.
+          <h1 className="font-display text-[clamp(2.4rem,6.4vw,5rem)] uppercase leading-[0.94]">
+            <span className="display-shadow inline-block">Windows will</span>{" "}
+            <span className="display-shadow inline-block -rotate-1">ask once.</span>
             <br />
-            <span className="text-nectar">Two clicks and you&rsquo;re in.</span>
+            <span className="inline-block text-orange">Two clicks and you&rsquo;re in.</span>
           </h1>
-          <p className="mx-auto mt-7 max-w-xl text-lg leading-relaxed text-muted">
+          <p className="mx-auto mt-7 max-w-xl text-[17px] leading-relaxed text-inkSoft">
             The first time you install Nectar, Windows shows a blue &ldquo;Windows protected your
             PC&rdquo; screen. Nothing is wrong — it says that about every app Microsoft has not seen
             enough of yet. Here is exactly what to click.
@@ -150,113 +188,99 @@ export default function DownloadStepsPage() {
         </section>
 
         {/* The prompt, in both states */}
-        <section className="mt-16 grid gap-10 rounded-3xl border border-white/10 bg-white/[0.03] p-8 sm:p-10 lg:grid-cols-2 lg:gap-14">
+        <section className="sticker-card mt-14 grid gap-10 bg-paperDeep p-6 sm:p-10 lg:grid-cols-2 lg:gap-12">
           <SmartScreenMock state="collapsed" label="What you will see" />
           <SmartScreenMock state="expanded" label="What you click" />
         </section>
 
         {/* Steps */}
         <section className="mt-20">
-          <h2 className="font-display text-3xl font-semibold sm:text-4xl">Three steps</h2>
-          <ol className="mt-8 grid list-none grid-cols-1 gap-px overflow-hidden rounded-3xl p-0 sm:grid-cols-3">
-            {STEPS.map((step) => (
-              <li key={step.number} className="bg-[#0b0b0e] p-7">
-                <span className="mb-5 grid h-8 w-8 place-items-center rounded-full border border-white/15 font-mono text-xs text-nectar">
+          <h2 className="font-display text-shout uppercase leading-[0.9]">Three steps</h2>
+          <ol className="mt-8 grid list-none grid-cols-1 gap-6 p-0 sm:grid-cols-3">
+            {STEPS.map((step, index) => (
+              <li
+                key={step.number}
+                className="sticker-card bg-paper p-6"
+                style={{ transform: `rotate(${index === 1 ? "0.9deg" : "-0.8deg"})` }}
+              >
+                <span className="font-display text-[36px] uppercase leading-none text-orange">
                   {step.number}
                 </span>
-                <h3 className="mb-2 font-display text-lg font-semibold">{step.title}</h3>
-                <p className="m-0 text-sm leading-relaxed text-muted">{step.copy}</p>
+                <h3 className="mt-2 font-display text-[24px] uppercase leading-none">
+                  {step.title}
+                </h3>
+                <p className="m-0 mt-3 text-[13.5px] leading-relaxed text-muted">{step.copy}</p>
               </li>
             ))}
           </ol>
         </section>
 
         {/* Reassurance */}
-        <section className="mt-20 grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
+        <section className="mt-20 grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:gap-14">
           <div>
-            <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-nectar">
+            <p className="mb-4 inline-block rotate-[-1.5deg] border-2 border-ink bg-sun px-2.5 py-1 text-[10.5px] font-bold uppercase tracking-[0.24em]">
               Why you are seeing this
             </p>
-            <h2 className="font-display text-3xl font-semibold leading-tight sm:text-4xl">
+            <h2 className="font-display text-[clamp(1.9rem,4vw,3rem)] uppercase leading-[0.9]">
               A missing reputation is not a warning.
             </h2>
-            <p className="mt-5 text-[15px] leading-relaxed text-muted">
+            <p className="mt-5 text-[15.5px] leading-relaxed text-muted">
               SmartScreen is a popularity check, not a virus scan. Microsoft builds a reputation for
               an installer as more people download and run it; until Nectar has one, the prompt is
               what Windows does by default. It is the same screen that greets small utilities,
               open-source tools and brand-new releases of well-known apps.
             </p>
-            <p className="mt-4 text-[15px] leading-relaxed text-muted">
+            <p className="mt-4 text-[15.5px] leading-relaxed text-muted">
               You are not switching off a protection or widening a setting — you are answering one
               question, about one file, once.
             </p>
           </div>
 
-          <dl className="m-0 space-y-6 rounded-3xl border border-white/10 bg-white/[0.03] p-8">
+          <dl className="m-0 space-y-0 rounded-sticker border-2 border-ink bg-paper p-6 shadow-sticker">
             {QUESTIONS.map((item) => (
-              <div key={item.question}>
-                <dt className="font-display text-base font-semibold">{item.question}</dt>
-                <dd className="m-0 mt-2 text-sm leading-relaxed text-muted">{item.answer}</dd>
+              <div key={item.question} className="border-t-2 border-ink/15 py-4 first:border-0 first:pt-0">
+                <dt className="font-display text-[20px] uppercase leading-none">{item.question}</dt>
+                <dd className="m-0 mt-2 text-[13.5px] leading-relaxed text-muted">{item.answer}</dd>
               </div>
             ))}
           </dl>
         </section>
 
         {/* Verification */}
-        <section className="mt-20 rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.05] to-transparent p-8 sm:p-10">
-          <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-nectar">
+        <section className="mt-20 rounded-sticker border-2 border-ink bg-paperDeep p-6 shadow-sticker sm:p-10">
+          <p className="mb-4 inline-block rotate-[-1.5deg] border-2 border-ink bg-leaf px-2.5 py-1 text-[10.5px] font-bold uppercase tracking-[0.24em]">
             Check it is really us
           </p>
-          <h2 className="font-display text-3xl font-semibold sm:text-4xl">
+          <h2 className="font-display text-shout uppercase leading-[0.9]">
             Before you click Run anyway
           </h2>
-          <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-muted">
+          <p className="mt-4 max-w-2xl text-[15.5px] leading-relaxed text-muted">
             Teaching someone to click past a warning only makes sense if they can also check who
             signed the file. Three things are worth a glance:
           </p>
 
-          <ul className="mt-8 grid list-none grid-cols-1 gap-px overflow-hidden rounded-2xl p-0 sm:grid-cols-3">
-            <li className="bg-[#0b0b0e] p-6">
-              <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
-                Publisher
-              </p>
-              <p className="m-0 text-sm leading-relaxed text-cream">
-                Today it will say{" "}
-                <em className="not-italic">Unknown publisher</em>: this build is not code-signed
-                yet, and signing certificates cost money we have not spent. Expected — but the line
-                should never show another company&rsquo;s name.
-              </p>
-              <p className="m-0 mt-3 text-[13px] leading-relaxed text-muted">
-                When a certificate is added it will read{" "}
-                <strong className="font-semibold text-nectar">Nectar</strong>. Until then the
-                checksum below is the check that does not depend on reputation.
-              </p>
-            </li>
-            <li className="bg-[#0b0b0e] p-6">
-              <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
-                Address
-              </p>
-              <p className="m-0 text-sm leading-relaxed text-cream">
-                The download starts on this site and hands you to{" "}
-                <strong className="font-semibold">github.com/b4b6u/Nectar</strong>, the
-                repository&rsquo;s own release page. If a link in an email or a chat window sends you
-                anywhere else, close it and come back here.
-              </p>
-            </li>
-            <li className="bg-[#0b0b0e] p-6">
-              <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
-                Checksum
-              </p>
-              <p className="m-0 text-sm leading-relaxed text-cream">
-                Every release publishes a SHA-256 beside the file. Compare yours with that line:{" "}
-                <code className="mt-2 block overflow-x-auto rounded bg-black/50 px-2 py-1.5 font-mono text-[11.5px] text-cream/90">
-                  Get-FileHash .\Nectar-Setup.exe
-                </code>
-              </p>
-            </li>
+          <ul className="mt-8 grid list-none grid-cols-1 gap-5 p-0 sm:grid-cols-3">
+            {CHECKS.map((check) => (
+              <li key={check.label} className="rounded-sticker border-2 border-ink bg-paper p-5">
+                <p className="mb-2 text-[10.5px] font-bold uppercase tracking-[0.2em] text-ink/60">
+                  {check.label}
+                </p>
+                <p className="m-0 text-[13.5px] leading-relaxed text-ink">
+                  {check.body}
+                </p>
+                {"after" in check && check.after ? (
+                  <p className="m-0 mt-3 text-[12.5px] leading-relaxed text-muted">{check.after}</p>
+                ) : null}
+                {"command" in check && check.command ? (
+                  <code className="mt-3 block overflow-x-auto rounded border-2 border-ink bg-ink px-2.5 py-2 font-mono text-[11.5px] text-paper">
+                    {check.command}
+                  </code>
+                ) : null}
+              </li>
+            ))}
           </ul>
 
-          <p className="mt-6 max-w-2xl text-[13px] leading-relaxed text-muted">
+          <p className="mt-6 max-w-2xl text-[12.5px] leading-relaxed text-muted">
             &ldquo;Unknown publisher&rdquo; means Windows has no record of the signer yet. A
             different <em className="not-italic">company</em> in that line means the file did not
             come from us — close the window and tell us, because someone is passing off a copy of
@@ -266,41 +290,50 @@ export default function DownloadStepsPage() {
 
         {/* CTA */}
         <section className="mx-auto mt-20 max-w-2xl text-center">
-          <h2 className="font-display text-3xl font-semibold sm:text-4xl">
-            Ready when you are.
-          </h2>
+          <h2 className="font-display text-shout uppercase leading-[0.9]">Ready when you are.</h2>
           <p className="mx-auto mt-4 max-w-lg text-[15px] leading-relaxed text-muted">
             The download is small, the install takes under a minute, and Nectar opens quietly in the
-            notch — press <kbd className="rounded border border-white/15 bg-white/5 px-1.5 py-0.5 font-mono text-[12px]">Alt</kbd>{" "}
-            + <kbd className="rounded border border-white/15 bg-white/5 px-1.5 py-0.5 font-mono text-[12px]">N</kbd>{" "}
+            notch — press{" "}
+            <kbd className="rounded border-2 border-ink bg-sun px-1.5 py-0.5 font-mono text-[12px]">
+              Alt
+            </kbd>{" "}
+            +{" "}
+            <kbd className="rounded border-2 border-ink bg-sun px-1.5 py-0.5 font-mono text-[12px]">
+              N
+            </kbd>{" "}
             to bring it down.
           </p>
 
           <a
-            className="mt-9 inline-block rounded-full bg-nectar px-8 py-4 text-[15px] font-semibold text-[#201109] shadow-[0_14px_40px_-18px_rgba(247,154,99,0.9)] transition hover:-translate-y-px hover:bg-[#ffa970]"
+            className="mt-9 inline-block rounded-full border-2 border-ink bg-orange px-8 py-3.5 text-[12px] font-bold uppercase tracking-[0.16em] text-paper shadow-sticker transition-transform hover:-translate-y-0.5 hover:bg-red"
             href={DOWNLOAD_URL}
             download
           >
             Download Nectar
           </a>
 
-          <p className="mt-5 font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
-            Windows 10 &amp; 11 · one setup file · no account needed
+          <p className="mt-5 text-[10.5px] font-bold uppercase tracking-[0.2em] text-muted">
+            Windows 10 &amp; 11 &middot; one setup file &middot; no account needed
           </p>
 
           <p className="mt-8 text-[13px] text-muted">
             Stuck on a step? The{" "}
-            <Link className="underline decoration-white/30 underline-offset-4" href="/">
+            <Link className="underline decoration-orange decoration-2 underline-offset-4" href="/">
               home page
             </Link>{" "}
             has the rest of the story, and the{" "}
-            <Link className="underline decoration-white/30 underline-offset-4" href="/privacy">
+            <Link
+              className="underline decoration-orange decoration-2 underline-offset-4"
+              href="/privacy"
+            >
               privacy page
             </Link>{" "}
             lists everything Nectar stores on your PC.
           </p>
         </section>
       </main>
+
+      <SiteFooter />
     </div>
   );
 }

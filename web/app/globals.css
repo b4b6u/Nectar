@@ -3,29 +3,92 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
-/* The soft orange bloom behind the notch, same trick as the app's bezel light. */
-body::before {
-  content: "";
-  position: fixed;
-  inset: -20vh 0 auto 0;
-  height: 70vh;
-  pointer-events: none;
-  z-index: 0;
-  background:
-    radial-gradient(60% 100% at 50% 0%, rgba(247, 154, 99, 0.16), transparent 70%),
-    radial-gradient(40% 80% at 80% 0%, rgba(163, 156, 208, 0.12), transparent 70%);
+/* Warm paper stock: two soft washes over the cream, plus a faint grain so the page reads as printed
+   rather than as a flat colour. The grain rides along with the page instead of being a fixed
+   blended layer — a full-screen multiply layer forced the compositor to re-blend on every scroll
+   and stalls capture and low-end GPUs. */
+body {
+  background-color: #fff2d6;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E"),
+    radial-gradient(120% 80% at 12% -10%, rgba(246, 87, 45, 0.08), transparent 60%),
+    radial-gradient(90% 70% at 88% 0%, rgba(184, 205, 73, 0.14), transparent 65%);
 }
 
 ::selection {
-  background: #f79a63;
-  color: #201109;
+  background: #ffcf4a;
+  color: #163b36;
 }
 
 :focus-visible {
-  outline: 2px solid #f79a63;
+  outline: 3px solid #f6572d;
   outline-offset: 3px;
-  border-radius: 4px;
+  border-radius: 6px;
+}
+
+/* ---- Poster type ------------------------------------------------------------------------- */
+
+/* The display face is drawn once, in ink, with a hard offset block behind it — the way the poster
+   sets its headline. Kept as utilities so headings stay plain h2/p in the markup. */
+.display-shadow {
+  text-shadow: 3px 3px 0 #163b36;
+}
+
+@media (min-width: 768px) {
+  .display-shadow {
+    text-shadow: 4px 5px 0 #163b36;
+  }
+}
+
+/* ---- Marquee ----------------------------------------------------------------------------- */
+
+.marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 38s linear infinite;
+}
+
+.marquee-slow {
+  animation-duration: 64s;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee {
+    animation: none;
+  }
+}
+
+/* ---- Stickers ---------------------------------------------------------------------------- */
+
+/* A pastel card that sits on the page like a cut-out: solid ink edge, a hard shadow, a touch of
+   rotation applied inline per card. */
+.sticker-card {
+  border: 2px solid #163b36;
+  border-radius: 18px;
+  box-shadow: 4px 4px 0 #163b36;
+}
+
+.sticker-card:hover {
+  box-shadow: 7px 7px 0 #163b36;
+}
+
+/* Dotted rules used to separate editorial columns. */
+.rule-dots {
+  background-image: radial-gradient(circle, #163b36 1px, transparent 1px);
+  background-size: 8px 8px;
+  background-repeat: repeat-x;
+  height: 4px;
+  opacity: 0.35;
 }
