@@ -21,36 +21,45 @@ Check, in this order:
 5. With no calendar linked, the Events card shows its empty state and the app makes no network
    request. Linking a calendar is the only action that leaves the machine.
 
-## 2. Publish the folder build
+## 2. Build and sign the MSIX
 
 ```powershell
-dotnet publish Nectar/Nectar.csproj -p:PublishProfile=win-x64
+.\scripts\package-msix.ps1
 ```
 
-This writes a self-contained `Nectar/bin/publish/win-x64`. Copy that folder somewhere clean (or to
-another machine) and start `Nectar.exe`: it must run without installing .NET or the Windows App SDK.
-
-Verify the copy in place:
+This builds `dist\Nectar-<version>-x64.msix` — one self-contained package containing the .NET
+runtime and the Windows App SDK — signs it, verifies the signature and prints its SHA-256. The
+certificate is a local one (see [`SIGNING.md`](SIGNING.md)); no signing service account is involved.
+For a self-signed certificate, trust it machine-wide first, or `Add-AppxPackage` fails with
+`0x800B0109`:
 
 ```powershell
-Get-ChildItem Nectar\bin\publish\win-x64 | Measure-Object -Property Length -Sum
+Import-Certificate -FilePath .\Nectar.cer -CertStoreLocation Cert:\LocalMachine\TrustedPeople
+```
+
+## 3. Install it like a user would
+
+```powershell
+Add-AppxPackage -Path .\dist\Nectar-2.0.0-x64.msix
+Start-Process explorer.exe "shell:AppsFolder\$((Get-AppxPackage Nectar.Desktop).PackageFamilyName)!Nectar"
+```
+
+Check, in this order:
+
+1. The app starts hidden — no window, no taskbar entry.
+2. `Nectar.lnk` appears on the desktop on that first launch, with the package icon, and starting it
+   opens the workspace.
+3. Nectar is listed in the Start menu.
+4. `Alt + N` opens the workspace and `Esc` collapses it.
+5. Data still lives in `%LOCALAPPDATA%\Nectar`; a first launch has no database until the first
+   task or note is added.
+
+```powershell
+Get-AppxPackage Nectar.Desktop | Remove-AppxPackage     # clean up the test install
 ```
 
 The database is created on first write, not at startup. An empty `%LOCALAPPDATA%\Nectar` after a
 first launch is expected; `nectar.db` and `db.key` appear together after the first task or note.
-
-## 3. Signing is optional and local
-
-Signing only matters when you hand the zip to someone else. Use a certificate you control — a
-public OV/EV certificate, or a self-signed one for a local dry run. The procedure, including
-`-AllowUntrusted` for a self-signed certificate, is in [`SIGNING.md`](SIGNING.md). No signing
-service account is needed for either path.
-
-```powershell
-.\scripts\sign-release.ps1 -PfxPath .\nectar-dev.pfx -Zip
-Get-AuthenticodeSignature .\Nectar\bin\publish\win-x64\Nectar.exe | Format-List Status, SignerCertificate
-Get-FileHash .\dist\Nectar-*-win-x64.zip -Algorithm SHA256
-```
 
 ## 4. Confirm the offline claim
 

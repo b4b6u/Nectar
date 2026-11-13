@@ -42,6 +42,10 @@ public partial class App : Application
         // calendar provider is written to nectar.log instead of happening silently.
         NetworkGuard.Start();
 
+        // Packaged builds get a desktop shortcut on first launch (MSIX has no install scripts);
+        // the portable build has no package identity, so this is a no-op there.
+        DesktopShortcut.Ensure();
+
         try
         {
             _window = new MainWindow();

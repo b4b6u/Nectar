@@ -2,9 +2,9 @@
 <!--
     Identity manifest for the *packaged* deployment of Nectar.
 
-    The unpackaged build (WindowsPackageType=None, the default here) needs none of this. It is
-    kept for a future MSIX submission; the calendar is read over OAuth from the provider's REST
-    API in both builds, so no appointment capability is requested.
+    Used by the packaged (MSIX) build. The unpackaged build ignores this file; the calendar is
+    read over OAuth from the provider's REST API in both builds, so no appointment capability is
+    requested.
 -->
 <Package
     xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
@@ -32,10 +32,13 @@
     </Resources>
 
     <Applications>
-        <Application Id="Nectar" Executable="Nectar.exe" EntryPoint="Windows.FullTrustApplication">
+        <!-- $targetentrypoint$ is replaced by the packaging targets with
+             "Windows.FullTrustApplication", which is what declares a full-trust desktop app.
+             Naming the App class here instead routes activation through the UWP app lifecycle
+             and the process dies in Application.Start before any of our code runs. -->
+        <Application Id="Nectar" Executable="Nectar.exe" EntryPoint="$targetentrypoint$">
             <uap:VisualElements
                 DisplayName="Nectar"
-                ShortName="Nectar"
                 Square150x150Logo="Assets\Square150x150Logo.png"
                 Square44x44Logo="Assets\Square44x44Logo.png"
                 Description="Nectar: A lightweight, top-anchored productivity workspace"
@@ -47,10 +50,12 @@
     </Applications>
 
     <Capabilities>
+        <!-- Restricted capabilities are declared first; MakeAppx's schema is strict about the
+             extension element's position within Capabilities. -->
+        <rescap:Capability Name="runFullTrust" />
         <Capability Name="internetClient" />
         <!-- In-app dictation reads the microphone when the user taps a mic chip. Win + H remains
              the fallback and needs no capability of its own. -->
         <DeviceCapability Name="microphone" />
-        <rescap:Capability Name="runFullTrust" />
     </Capabilities>
 </Package>

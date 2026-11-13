@@ -20,44 +20,46 @@ Nectar runs entirely on the device: the workspace lives in an encrypted SQLite f
 The only network connections are the ones you start yourself by linking a calendar — Google
 Calendar or Microsoft Graph, over their OAuth endpoints.
 
-Releases are built and run locally; no cloud signing account is involved. `release-zip.yml` is an
-optional convenience that publishes the self-contained folder build, signed with **your own**
-certificate from a `BASE64_PFX` secret, and attaches the zip plus its SHA-256 to a tag. Local
-publish, signing and verification are in [`docs/SIGNING.md`](docs/SIGNING.md); the offline release
+Releases are built and run locally; no cloud signing account is involved. Nectar ships as one
+signed **MSIX** package, built and signed with **your own** certificate on your own machine. Local
+packaging, signing and verification are in [`docs/SIGNING.md`](docs/SIGNING.md); the offline release
 checklist is in [`docs/RELEASE-DRY-RUN.md`](docs/RELEASE-DRY-RUN.md).
 
-## Landing page
+## Website
 
-`index.html` is a dependency-free marketing page for the app (`site.css`, `site.js`): no build
-step, no framework, no package install. Open the file directly, or import the repository into
-Vercel with the framework preset left on **Other** and no build command. It reads the screenshots
-in `docs/` and the app icon in `Nectar/Assets/`, so nothing needs copying.
+The landing page, the install guide and the legal pages are one Next.js app in `web/` — nothing
+else in the repository is served. `web/app/page.tsx` is the landing page (workspace tour, the three
+ways in, calendar, customize, insights, local-first facts, install), `web/app/download-steps/page.tsx`
+explains the Windows SmartScreen prompt before the download, and `web/app/privacy` +
+`web/app/licence` are the legal pages, in the same header and footer as everything else.
+`web/app/api/download/appinstaller/route.ts` builds the App Installer feed from the latest GitHub
+release, so no signed MSIX is committed here.
 
-Repository links and the clone command come from `REPO_URL` at the top of `site.js` — point it at
-your GitHub repository before publishing.
+```bash
+cd web
+npm install
+npm run dev     # http://localhost:3000
+npm run build   # static pages plus the feed route
+npm test        # tsc + node --test
+```
 
-The canonical URL, the Open Graph image, `robots.txt` and `sitemap.xml` share one placeholder host,
-`https://nectar.vercel.app`. Replace it in those three files with your own domain before
-publishing — social crawlers only follow the absolute form, so it cannot be filled in by script.
+Deploy it as one Vercel project with **Root Directory** set to `web` and the Next.js preset; there
+is no build step at the repository root any more. Security headers, the `/download` redirects and
+the `/privacy.html` → `/privacy` and `/licence.html` → `/licence` redirects all live in
+`web/next.config.mjs`.
 
-The JSON-LD block in `index.html` describes Nectar as a `SoftwareApplication` (category, platform,
-free offer, screenshots, feature list). It repeats the same host, so it is one more place to
-replace, and its `sameAs` entry is the repository URL the clone snippet shows — update both when
-the repo exists. Everything else in the block is drawn from the app itself, so a version bump
-means editing `softwareVersion` there as well as in `Nectar.csproj`.
+The canonical host lives in `web/app/layout.tsx` (`metadataBase`) and in `web/app/robots.ts` +
+`web/app/sitemap.ts`. Change all three together when the domain changes — they generate the absolute
+URLs that crawlers and link previews follow.
 
-`privacy.html` and `licence.html` are static pages in the same shell — same `site.css`, same pill
-bar and footer — linked from the footer of every page. Both declare their own canonical URL, so
-they carry the `SITE_URL` placeholder too. The licence page states MIT; the repository has no
-`LICENSE` file yet, so add one with matching text before publishing.
-
-The favicon set (`favicon.ico`, 16/32 px PNGs, `apple-touch-icon.png`, 192/512 px PWA icons and a
-maskable 512 px icon, plus `manifest.webmanifest`) is generated from `docs/logo-source.png`.
-`docs/og-card.html` is the 1200 × 630 link-preview card; re-render it after changing the copy:
+Screenshots in `web/public/docs/` are copies of `docs/*.png`; recopy them after re-shooting the app.
+The favicon set, the PWA icons, `manifest.webmanifest` and `og-image.png` live in `web/public/` and
+are generated from `docs/logo-source.png`. `docs/og-card.html` is the 1200 × 630 link-preview card;
+re-render it after changing the copy, writing straight into the app:
 
 ```bash
 msedge --headless=new --window-size=1200,630 --force-device-scale-factor=1 \
-  --screenshot=og-image.png docs/og-card.html
+  --screenshot=web/public/og-image.png docs/og-card.html
 ```
 
 ---
@@ -83,20 +85,44 @@ The app starts hidden. Bring it up with:
 - move the pointer to the **top-centre 240 x 6 px band** — hover expands it
 - clicking the **pill** also expands it (the pill itself can be switched off)
 
-## Publishing a signed build
+## Packaging an MSIX
+
+```powershell
+.\scripts\package-msix.ps1
+```
+
+The script builds one **self-contained** package — the .NET runtime and the Windows App SDK travel
+inside it, so the target machine needs nothing pre-installed — signs it with a local code-signing
+certificate, checks the signature and prints the SHA-256. The result is
+dist\Nectar-<version>-x64.msix.
+
+```powershell
+Add-AppxPackage -Path .\dist\Nectar-2.0.0-x64.msix
+```
+
+Windows lists Nectar in the Start menu, and the first launch drops **Nectar.lnk** on the desktop
+pointing at the app's AUMID with the package icon. An MSIX cannot run an install script, so the
+shortcut is created by the app itself. Remove the app with:
+
+```powershell
+Get-AppxPackage Nectar.Desktop | Remove-AppxPackage
+```
+
+An MSIX must be signed or Windows refuses to install it, so the script needs a certificate: it uses
+`CN=Nectar` from `Cert:\CurrentUser\My` by default, or `-Thumbprint` / `-PfxPath`. A self-signed
+certificate also has to be trusted machine-wide in `Cert:\LocalMachine\TrustedPeople` (one elevated
+import, only for packages you build yourself). Certificate options and verification are in
+[docs/SIGNING.md](docs/SIGNING.md). Never commit a `.pfx`.
+
+## Publishing a loose folder
 
 ```powershell
 dotnet publish Nectar/Nectar.csproj -p:PublishProfile=win-x64
 .\scripts\sign-release.ps1 -PfxPath .\nectar-signing.pfx -Zip
 ```
 
-The profile writes a **self-contained** folder to `Nectar/bin/publish/win-x64` — the .NET runtime
-and the Windows App SDK travel with the app, so a copied folder starts on a clean machine. The
-script signs `Nectar.exe` with SHA-256 and an RFC 3161 timestamp, verifies the result, and with
-`-Zip` writes `dist\Nectar-<version>-win-x64.zip` plus its SHA-256: the pair to attach to a
-release. Certificate options (OV, EV, or a local self-signed certificate for testing), local dry runs
-and an optional GitHub Actions example are in [docs/SIGNING.md](docs/SIGNING.md). Never commit a
-`.pfx`.
+The profile writes a **self-contained** folder to `Nectar/bin/publish/win-x64` for running without
+installing anything — handy while developing. It is not the release artifact; the MSIX above is.
 
 ## Controls
 

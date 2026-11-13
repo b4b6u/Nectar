@@ -1,0 +1,222 @@
+name: release-msix
+
+# MSIX release: builds the self-contained package, signs it with the developer's own code-signing
+# certificate from a PFX secret, and attaches the package, the rendered .appinstaller feed and both
+# SHA-256 sidecars to the tagged release. The website's /downloads/nectar.appinstaller route reads
+# that release to build the live feed, so the asset names and the version in the tag are the
+# interface — renaming them breaks updates for installed copies.
+#
+# No cloud signing service is involved; the certificate is yours.
+#
+# Required secrets: BASE64_PFX, PFX_PASSWORD  (see docs/SIGNING.md)
+
+"on":
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: msix-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-sign-release:
+    name: Build, sign and publish the MSIX
+    runs-on: windows-latest
+    env:
+      DOTNET_VERSION: 8.0.x
+
+    steps:
+      - name: Check out the tagged commit
+        uses: actions/checkout@v4
+
+      # The version is read, never stamped: the tag, the project and the package manifest must
+      # already agree, because the manifest is the identity Windows installs and upgrades against.
+      - name: Read and cross-check the version
+        id: v
+        shell: pwsh
+        run: |
+          [xml]$project = Get-Content 'Nectar/Nectar.csproj'
+          $version = $project.Project.PropertyGroup.Version |
+            Where-Object { $_ } | Select-Object -First 1
+          if (-not $version) { throw 'Nectar/Nectar.csproj has no <Version>.' }
+          if ($version -notmatch '^\d+\.\d+\.\d+$') {
+            throw "Version '$version' must look like MAJOR.MINOR.PATCH."
+          }
+
+          [xml]$manifest = Get-Content 'Nectar/Package.appxmanifest'
+          $identity = $manifest.Package.Identity
+          $expected = "$version.0"
+          if ($identity.Version -ne $expected) {
+            throw "Package.appxmanifest declares $($identity.Version); the project version needs $expected."
+          }
+
+          if ('${{ github.event_name }}' -eq 'push') {
+            if ('${{ github.ref_name }}' -ne "v$version") {
+              throw "Tag '${{ github.ref_name }}' does not match the project version v$version."
+            }
+          }
+
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "identity=$expected" >> $env:GITHUB_OUTPUT
+          "package=$($identity.Name)" >> $env:GITHUB_OUTPUT
+          Write-Host "Releasing Nectar $version as $($identity.Name) $expected"
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Decode the signing certificate
+        id: cert
+        shell: pwsh
+        env:
+          BASE64_PFX: ${{ secrets.BASE64_PFX }}
+          PFX_PASSWORD: ${{ secrets.PFX_PASSWORD }}
+        run: |
+          if (-not $env:BASE64_PFX) { throw 'Secret BASE64_PFX is missing or empty.' }
+          if (-not $env:PFX_PASSWORD) { throw 'Secret PFX_PASSWORD is missing or empty.' }
+
+          $pfx = Join-Path $env:RUNNER_TEMP 'signing.pfx'
+          [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String($env:BASE64_PFX))
+          "pfx=$pfx" >> $env:GITHUB_OUTPUT
+
+      # The same script developers run locally, so CI and a dry run cannot drift apart: it builds
+      # the self-contained package, signs it SHA-256 with an RFC 3161 timestamp, verifies the
+      # signature and stages dist/Nectar-<version>-x64.msix.
+      - name: Build and sign the package
+        shell: pwsh
+        env:
+          # Read by scripts/package-msix.ps1, so the password never appears on a command line.
+          NECTAR_PFX_PASSWORD: ${{ secrets.PFX_PASSWORD }}
+        run: |
+          ./scripts/package-msix.ps1 -PfxPath '${{ steps.cert.outputs.pfx }}'
+          if ($LASTEXITCODE -ne 0) { throw "package-msix.ps1 failed with $LASTEXITCODE" }
+
+          $msix = "dist/Nectar-${{ steps.v.outputs.version }}-x64.msix"
+          if (-not (Test-Path $msix)) { throw "Expected $msix to exist" }
+
+      # Signing does not check that the certificate can install the package — only the manifest
+      # publisher decides that, and a mismatch fails on every customer machine, not here. Read the
+      # identity back out of the finished package and compare it with the signer.
+      - name: Check the packed identity matches the signer
+        shell: pwsh
+        run: |
+          $msix = "dist/Nectar-${{ steps.v.outputs.version }}-x64.msix"
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+
+          $zip = [IO.Compression.ZipFile]::OpenRead((Resolve-Path $msix))
+          try {
+            $entry = $zip.Entries | Where-Object { $_.FullName -eq 'AppxManifest.xml' }
+            if (-not $entry) { throw 'The package has no AppxManifest.xml.' }
+            $reader = [IO.StreamReader]::new($entry.Open())
+            try { [xml]$packed = $reader.ReadToEnd() } finally { $reader.Dispose() }
+          } finally { $zip.Dispose() }
+
+          $identity = $packed.Package.Identity
+          $signature = Get-AuthenticodeSignature $msix
+          if ($signature.Status -ne 'Valid') { throw "Signature status is $($signature.Status)." }
+          $signer = $signature.SignerCertificate.Subject
+
+          Write-Host "packed publisher : $($identity.Publisher)"
+          Write-Host "signing subject  : $signer"
+          Write-Host "packed version   : $($identity.Version)"
+
+          if ($identity.Publisher -ne $signer) {
+            throw "Publisher '$($identity.Publisher)' does not match '$signer'; Add-AppxPackage would reject this package."
+          }
+          if ($identity.Version -ne '${{ steps.v.outputs.identity }}') {
+            throw "Packed version '$($identity.Version)' is not '${{ steps.v.outputs.identity }}'."
+          }
+
+      # The site's feed route reads <MainPackage Publisher=...> from this asset, so the download page
+      # cannot disagree with the build it is serving. Windows also accepts the file directly.
+      - name: Render the release .appinstaller
+        shell: pwsh
+        run: |
+          $package = '${{ steps.v.outputs.package }}'
+          $identity = '${{ steps.v.outputs.identity }}'
+          $tag = 'v${{ steps.v.outputs.version }}'
+          $name = "Nectar-${{ steps.v.outputs.version }}-x64.msix"
+          $base = "https://github.com/${{ github.repository }}/releases/download/$tag"
+          $publisher = (Get-AuthenticodeSignature "dist/$name").SignerCertificate.Subject
+
+          # A format string, not a here-string: PowerShell wants the closing "@ in column 0, which
+          # would end the YAML block scalar this script lives in.
+          $template = '<?xml version="1.0" encoding="utf-8"?>
+          <AppInstaller
+              xmlns="http://schemas.microsoft.com/appx/appinstaller/2018"
+              Version="1.0.0.0"
+              Uri="{0}/nectar.appinstaller">
+
+            <MainPackage
+                Name="{1}"
+                Version="{2}"
+                Publisher="{3}"
+                ProcessorArchitecture="x64"
+                Uri="{0}/{4}" />
+
+            <UpdateSettings>
+              <OnLaunch HoursBetweenUpdateChecks="0" ShowPrompt="false" UpdateMode="Automatic" />
+              <AutomaticBackgroundTask />
+              <ForceUpdateFromAnyVersion>false</ForceUpdateFromAnyVersion>
+            </UpdateSettings>
+          </AppInstaller>
+          '
+          $feed = $template -f $base, $package, $identity, $publisher, $name
+
+          $path = 'dist/nectar.appinstaller'
+          [IO.File]::WriteAllText($path, $feed, [Text.UTF8Encoding]::new($false))
+          Write-Host "Wrote $path for $name"
+
+      - name: Write the SHA-256 sidecars
+        shell: pwsh
+        run: |
+          $files = @(
+            "dist/Nectar-${{ steps.v.outputs.version }}-x64.msix",
+            'dist/nectar.appinstaller'
+          )
+
+          foreach ($file in $files) {
+            if (-not (Test-Path $file)) { throw "Missing $file" }
+            $hash = (Get-FileHash $file -Algorithm SHA256).Hash.ToLower()
+            $leaf = Split-Path $file -Leaf
+            [IO.File]::WriteAllText("$file.sha256", "$hash  $leaf`n", [Text.UTF8Encoding]::new($false))
+            Write-Host "$leaf  $hash"
+          }
+
+      # No name/body here on purpose: this is the only release workflow, and leaving them out keeps
+      # a re-run from overwriting notes edited by hand.
+      - name: Attach the package, the feed and the hashes
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.v.outputs.version }}
+          files: |
+            dist/Nectar-${{ steps.v.outputs.version }}-x64.msix
+            dist/Nectar-${{ steps.v.outputs.version }}-x64.msix.sha256
+            dist/nectar.appinstaller
+            dist/nectar.appinstaller.sha256
+
+      # `if: always()` matters: without it a failed build or a cancelled run leaves the decoded PFX
+      # on the runner. Runners are ephemeral, but a retried job can reuse the workspace, and
+      # anything uploaded as an artefact afterwards must not be able to pick the key up.
+      - name: Delete the signing key from the runner
+        if: always()
+        shell: pwsh
+        run: |
+          $pfx = Join-Path $env:RUNNER_TEMP 'signing.pfx'
+          if (Test-Path $pfx) {
+            Remove-Item $pfx -Force
+            Write-Host "Deleted $pfx"
+          }
+
+          # Sweep any copy a script or profiler may have left behind.
+          Get-ChildItem -Path $env:RUNNER_TEMP, $env:GITHUB_WORKSPACE -Filter *.pfx -Recurse -ErrorAction SilentlyContinue |
+            Remove-Item -Force -ErrorAction SilentlyContinue
+
+          if (Test-Path $pfx) { throw 'The signing key survived cleanup; investigate before shipping.' }
+          Write-Host 'No PFX remains on the runner.'

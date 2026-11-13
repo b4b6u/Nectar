@@ -34,8 +34,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.250205002" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1742" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260921001" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.4654" />
     <!-- SQLCipher: .Core is the EF provider without a bundled SQLite, so the cipher native
          library below is the only provider in the process. Mixing in bundle_e_sqlite3 makes the
          app load whichever native DLL wins and breaks PRAGMA key at runtime. -->
