@@ -43,10 +43,12 @@ npm run build   # static pages plus the feed route
 npm test        # tsc + node --test
 ```
 
-Deploy it as one Vercel project with **Root Directory** set to `web` and the Next.js preset; there
-is no build step at the repository root any more. Security headers, the `/download` redirects and
-the `/privacy.html` → `/privacy` and `/licence.html` → `/licence` redirects all live in
-`web/next.config.mjs`.
+Production is <https://nectar-chi-eight.vercel.app>, deployed from the Vercel project `nectar`, whose
+**Root Directory** is `web` — so a push to `main` deploys the site and there is no build step at the
+repository root. `NECTAR_GITHUB_REPO=b4b6u/Nectar` is set for the `/download/windows` route and the
+MSIX feed. Without a Root Directory of `web`, a Git-connected project builds the repository root and
+fails. Security headers, the `/download` redirects and the `/privacy.html` → `/privacy` and
+`/licence.html` → `/licence` redirects all live in `web/next.config.mjs`.
 
 The canonical host lives in `web/app/layout.tsx` (`metadataBase`) and in `web/app/robots.ts` +
 `web/app/sitemap.ts`. Change all three together when the domain changes — they generate the absolute
