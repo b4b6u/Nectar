@@ -47,7 +47,7 @@ const QUESTIONS = [
   {
     question: "Will it ask again?",
     answer:
-      "Not for Nectar. Windows remembers the choice for that installer, and updates arrive without a prompt because the app checks its own feed quietly in the background."
+      "Windows remembers the choice for that file, so reinstalling the same download is quiet. A newer version arrives as a new file: run its setup over the top and your tasks, note and settings stay exactly where they are."
   }
 ] as const;
 
@@ -221,15 +221,15 @@ export default function DownloadStepsPage() {
                 Publisher
               </p>
               <p className="m-0 text-sm leading-relaxed text-cream">
-                That dialog names the app and the company that signed it. Nectar is signed as{" "}
-                <strong className="font-semibold text-nectar">Nectar</strong>, the name on every
-                build we ship.
+                Today it will say{" "}
+                <em className="not-italic">Unknown publisher</em>: this build is not code-signed
+                yet, and signing certificates cost money we have not spent. Expected — but the line
+                should never show another company&rsquo;s name.
               </p>
               <p className="m-0 mt-3 text-[13px] leading-relaxed text-muted">
-                Today the line may still say{" "}
-                <em className="not-italic">Unknown publisher</em>, because Windows has not built up
-                reputation for our certificate yet. Expected — but it should never show another
-                company&rsquo;s name.
+                When a certificate is added it will read{" "}
+                <strong className="font-semibold text-nectar">Nectar</strong>. Until then the
+                checksum below is the check that does not depend on reputation.
               </p>
             </li>
             <li className="bg-[#0b0b0e] p-6">
@@ -237,19 +237,20 @@ export default function DownloadStepsPage() {
                 Address
               </p>
               <p className="m-0 text-sm leading-relaxed text-cream">
-                You should still be on <strong className="font-semibold">nectar.app</strong> when
-                the download starts. If a link in an email or a chat window sends you somewhere
-                else, close it and come back here.
+                The download starts on this site and hands you to{" "}
+                <strong className="font-semibold">github.com/b4b6u/Nectar</strong>, the
+                repository&rsquo;s own release page. If a link in an email or a chat window sends you
+                anywhere else, close it and come back here.
               </p>
             </li>
             <li className="bg-[#0b0b0e] p-6">
               <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
-                Signature
+                Checksum
               </p>
               <p className="m-0 text-sm leading-relaxed text-cream">
-                Windows records who signed what it installed. After setup, ask it:{" "}
+                Every release publishes a SHA-256 beside the file. Compare yours with that line:{" "}
                 <code className="mt-2 block overflow-x-auto rounded bg-black/50 px-2 py-1.5 font-mono text-[11.5px] text-cream/90">
-                  Get-AppxPackage Nectar.Desktop | Select Publisher
+                  Get-FileHash .\Nectar-Setup.exe
                 </code>
               </p>
             </li>
