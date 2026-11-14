@@ -5,6 +5,7 @@
  */
 
 import Image from "next/image";
+import AppDemo from "../components/AppDemo";
 import SiteFooter from "../components/SiteFooter";
 import SiteHeader from "../components/SiteHeader";
 
@@ -259,25 +260,11 @@ export default function Home() {
             </p>
           </div>
 
-          {/* The overlay itself, in a cut-out frame */}
+          {/* The overlay itself, playable: the same four cards the app drops out of the notch. */}
           <figure className="relative mx-auto mt-14 max-w-[1000px]">
-            <div className="sticker-card overflow-hidden bg-ink shadow-stickerLg">
-              <div className="flex items-center gap-2.5 border-b-2 border-ink bg-paper px-4 py-2.5 text-[10.5px] font-bold uppercase tracking-[0.18em]">
-                <span className="h-2.5 w-2.5 rounded-full border border-ink bg-orange" />
-                <span>Nectar</span>
-                <span className="ml-auto font-mono text-[11px] tracking-normal">25:00</span>
-              </div>
-              <Image
-                alt="The Nectar workspace open on Windows: four pastel cards for tasks, focus timer, notepad and events, with Insights and Customize tabs in the header."
-                className="h-auto w-full"
-                height={340}
-                priority
-                src="/docs/nectar-expanded.png"
-                width={1000}
-              />
-            </div>
+            <AppDemo />
             <figcaption className="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[10.5px] font-bold uppercase tracking-[0.16em] text-muted">
-              <span>Fig. 01 &mdash; the workspace, 1000 &times; 340 px</span>
+              <span>Fig. 01 &mdash; the workspace, playable</span>
               <span aria-hidden className="text-orange">
                 &darr;&darr;&darr;
               </span>

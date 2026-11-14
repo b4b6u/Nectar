@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 /**
@@ -9,7 +10,15 @@ export default function SiteHeader() {
   return (
     <header className="relative z-20 border-b-2 border-ink bg-paper">
       <div className="mx-auto flex max-w-shell items-center justify-between gap-4 px-5 py-4 sm:px-6">
-        <Link className="group flex items-baseline gap-1.5" href="/">
+        <Link className="group flex items-center gap-2" href="/">
+          <Image
+            alt="Nectar"
+            className="h-[30px] w-[30px] rounded-[9px] border-2 border-ink transition-transform group-hover:-rotate-6"
+            height={30}
+            priority
+            src="/Nectar/Assets/nectar-mark.scale-400.png"
+            width={30}
+          />
           <span className="font-display text-[26px] uppercase leading-none tracking-[0.01em]">
             nectar
           </span>
