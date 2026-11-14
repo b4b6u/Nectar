@@ -1,14 +1,17 @@
 using System.ComponentModel;
 using System.Diagnostics;
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Shapes;
+using Nectar.Interop;
 using Nectar.Services;
 using Nectar.Services.Calendar;
 using Nectar.ViewModels;
 using Windows.Graphics;
 using Windows.UI;
+using WinRT.Interop;
 
 namespace Nectar;
 
@@ -35,7 +38,7 @@ public sealed partial class SettingsWindow : Window
         _readMicrophone = readMicrophone;
 
         Title = "Nectar settings";
-        AppWindow.Resize(new SizeInt32(760, 720));
+        SizeToContent();
 
         BuildThemeChoices();
         ViewModel.PropertyChanged += OnViewModelPropertyChanged;
@@ -45,6 +48,21 @@ public sealed partial class SettingsWindow : Window
     }
 
     public WorkspaceViewModel ViewModel { get; }
+
+    /// <summary>
+    /// 760 x 720 DIP is comfortable at 100% and unusable at 200%, so the size is scaled by the
+    /// window's own DPI and capped against the work area of the display it opens on.
+    /// </summary>
+    private void SizeToContent()
+    {
+        var scale = NativeMethods.GetDpiForWindow(WindowNative.GetWindowHandle(this)) / 96.0;
+        var workArea = DisplayArea.GetFromWindowId(AppWindow.Id, DisplayAreaFallback.Primary).WorkArea;
+
+        var width = Math.Min((int)(760 * scale), (int)(workArea.Width * 0.9));
+        var height = Math.Min((int)(720 * scale), (int)(workArea.Height * 0.9));
+
+        AppWindow.Resize(new SizeInt32(width, height));
+    }
 
     public string VersionLabel
     {
