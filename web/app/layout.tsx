@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import ForestJourney from "../components/ForestJourney";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://nectarnotch.vercel.app"),
@@ -29,8 +30,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Set the palette before the first paint so a remembered dark choice never flashes cream. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{var t=localStorage.getItem('nectar:theme');var d=t?t==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;if(d)document.documentElement.classList.add('dark')}catch(e){}"
+          }}
+        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
@@ -38,7 +46,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body className="bg-paper font-sans text-ink antialiased">{children}</body>
+      <body className="bg-paper font-sans text-ink antialiased transition-colors duration-300">
+        {children}
+        <ForestJourney />
+      </body>
     </html>
   );
 }

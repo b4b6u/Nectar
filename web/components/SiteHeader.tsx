@@ -34,7 +34,7 @@ export default function SiteHeader() {
         </nav>
 
         <Link
-          className="rounded-full border-2 border-ink bg-sun px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.16em] shadow-sticker transition-transform hover:-translate-y-0.5 hover:bg-leaf"
+          className="rounded-full border-2 border-ink bg-sun px-4 py-1.5 text-inkSolid text-[11px] font-bold uppercase tracking-[0.16em] shadow-sticker transition-transform hover:-translate-y-0.5 hover:bg-leaf"
           href="/download-steps"
         >
           Download <span aria-hidden>&darr;</span>

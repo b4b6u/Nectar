@@ -2,29 +2,67 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ---- Palettes ---------------------------------------------------------------------------- */
+
+/* Light: cream stock and green ink, the printed poster. Dark: the same page after the lights go
+   out — a deep forest canvas, warm cream type, and the accents lifted a little so they still
+   carry on a dark ground. Everything downstream reads these variables. */
 :root {
   color-scheme: light;
+  --paper-rgb: 255 242 214;
+  --paper-deep-rgb: 247 231 196;
+  --ink-rgb: 22 59 54;
+  --ink-soft-rgb: 43 79 71;
+  --muted-rgb: 91 109 92;
+  --orange-rgb: 246 87 45;
+  --red-rgb: 217 62 38;
+  --leaf-rgb: 184 205 73;
+  --sun-rgb: 255 207 74;
+  --blush-rgb: 245 182 191;
+  --twig-rgb: 22 59 54;
+  --bird-a: #3d7058;
+  --bird-b: #8fc19a;
+  --bird-beak: #f6572d;
+  --halo: rgba(255, 242, 214, 0.9);
 }
 
-/* Warm paper stock: two soft washes over the cream, plus a faint grain so the page reads as printed
-   rather than as a flat colour. The grain rides along with the page instead of being a fixed
-   blended layer — a full-screen multiply layer forced the compositor to re-blend on every scroll
-   and stalls capture and low-end GPUs. */
+.dark {
+  color-scheme: dark;
+  --paper-rgb: 12 32 28;
+  --paper-deep-rgb: 18 44 38;
+  --ink-rgb: 244 233 208;
+  --ink-soft-rgb: 214 208 184;
+  --muted-rgb: 158 174 158;
+  --orange-rgb: 255 122 74;
+  --red-rgb: 233 96 66;
+  --leaf-rgb: 199 220 92;
+  --sun-rgb: 255 214 92;
+  --blush-rgb: 240 152 168;
+  --twig-rgb: 196 220 190;
+  --bird-a: #7fc0a0;
+  --bird-b: #b9e3c2;
+  --bird-beak: #ff8a5f;
+  --halo: rgba(12, 32, 28, 0.9);
+}
+
+/* Warm paper stock: a faint grain and two soft washes so the page reads as printed rather than as
+   a flat colour. The grain rides along with the page instead of being a fixed blended layer — a
+   full-screen multiply layer forces the compositor to re-blend on every scroll. */
 body {
-  background-color: #fff2d6;
+  background-color: rgb(var(--paper-rgb));
   background-image:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E"),
-    radial-gradient(120% 80% at 12% -10%, rgba(246, 87, 45, 0.08), transparent 60%),
-    radial-gradient(90% 70% at 88% 0%, rgba(184, 205, 73, 0.14), transparent 65%);
+    radial-gradient(120% 80% at 12% -10%, rgb(var(--orange-rgb) / 0.08), transparent 60%),
+    radial-gradient(90% 70% at 88% 0%, rgb(var(--leaf-rgb) / 0.14), transparent 65%);
 }
 
 ::selection {
-  background: #ffcf4a;
+  background: rgb(var(--sun-rgb));
   color: #163b36;
 }
 
 :focus-visible {
-  outline: 3px solid #f6572d;
+  outline: 3px solid rgb(var(--orange-rgb));
   outline-offset: 3px;
   border-radius: 6px;
 }
@@ -32,14 +70,14 @@ body {
 /* ---- Poster type ------------------------------------------------------------------------- */
 
 /* The display face is drawn once, in ink, with a hard offset block behind it — the way the poster
-   sets its headline. Kept as utilities so headings stay plain h2/p in the markup. */
+   sets its headline. Kept as a utility so headings stay plain h2/p in the markup. */
 .display-shadow {
-  text-shadow: 3px 3px 0 #163b36;
+  text-shadow: 3px 3px 0 rgb(var(--ink-rgb));
 }
 
 @media (min-width: 768px) {
   .display-shadow {
-    text-shadow: 4px 5px 0 #163b36;
+    text-shadow: 4px 5px 0 rgb(var(--ink-rgb));
   }
 }
 
@@ -51,10 +89,6 @@ body {
   animation: marquee 38s linear infinite;
 }
 
-.marquee-slow {
-  animation-duration: 64s;
-}
-
 @keyframes marquee {
   from {
     transform: translateX(0);
@@ -64,17 +98,127 @@ body {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .marquee {
-    animation: none;
+/* ---- The forest -------------------------------------------------------------------------- */
+
+/* Every piece of the scene casts the same shadow: a cream rim light and a soft drop, which is what
+   lets brown branches sit on a cream page without going flat. */
+.branch-shadow {
+  filter: drop-shadow(rgba(255, 242, 214, 0.55) 0 0 1px) drop-shadow(rgba(22, 59, 54, 0.16) 2px 4px);
+}
+
+.dark .branch-shadow {
+  filter: drop-shadow(rgba(12, 32, 28, 0.6) 0 0 1px) drop-shadow(rgba(0, 0, 0, 0.4) 3px 5px);
+}
+
+/* Branches sway from the edge they grow out of, never in step: three tempos per side, each with a
+   negative delay so they are already mid-sway on load. */
+.branch-left-a {
+  transform-origin: 0 center;
+  animation: branch-sway-left-slow 9.5s ease-in-out 0s infinite;
+}
+
+.branch-left-b {
+  transform-origin: 0 center;
+  animation: branch-sway-left-gentle 11.4s ease-in-out -3.2s infinite;
+}
+
+.branch-left-c {
+  transform-origin: 0 center;
+  animation: branch-sway-left-slow 13.2s ease-in-out -6.1s infinite;
+}
+
+.branch-right-a {
+  transform-origin: 100% center;
+  animation: branch-sway-right-slow 10.2s ease-in-out -1.8s infinite;
+}
+
+.branch-right-b {
+  transform-origin: 100% center;
+  animation: branch-sway-right-gentle 12.1s ease-in-out -4.7s infinite;
+}
+
+.branch-right-c {
+  transform-origin: 100% center;
+  animation: branch-sway-right-slow 13.8s ease-in-out -7.4s infinite;
+}
+
+@keyframes branch-sway-left-slow {
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+  35% {
+    transform: rotate(1.35deg) translateY(2px);
+  }
+  70% {
+    transform: rotate(-1.05deg) translateY(-1.5px);
   }
 }
 
-/* ---- The hummingbird --------------------------------------------------------------------- */
+@keyframes branch-sway-left-gentle {
+  0%,
+  100% {
+    transform: rotate(-0.4deg) translateY(0);
+  }
+  50% {
+    transform: rotate(1.5deg) translateY(2.5px);
+  }
+}
 
-/* The whole document is the timeline: the bird leaves the left branch at the top of the page and
-   lands on the right one at the bottom, wherever the reader happens to be. Scroll timelines pin
-   the transform to the scroll position, so it never lags or re-eases. */
+@keyframes branch-sway-right-slow {
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+  40% {
+    transform: rotate(-1.4deg) translateY(2px);
+  }
+  75% {
+    transform: rotate(1.05deg) translateY(-1.5px);
+  }
+}
+
+@keyframes branch-sway-right-gentle {
+  0%,
+  100% {
+    transform: rotate(0.4deg) translateY(0);
+  }
+  50% {
+    transform: rotate(-1.55deg) translateY(2.5px);
+  }
+}
+
+/* Leaves fall on their own clocks, drifting a little to one side as they turn. */
+.leaf {
+  animation-name: leaf-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes leaf-fall {
+  0% {
+    transform: translate3d(0, -10vh, 0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.92;
+  }
+  50% {
+    transform: translate3d(calc(18px * var(--drift, 1)), 52vh, 0) rotate(190deg);
+  }
+  90% {
+    opacity: 0.75;
+  }
+  100% {
+    transform: translate3d(calc(-12px * var(--drift, 1)), 104vh, 0) rotate(370deg);
+    opacity: 0;
+  }
+}
+
+/* The whole-document timeline: the traveller leaves the left branch at the top of the page and
+   lands on the right one at the bottom. Scroll timelines pin the transform to the scroll position,
+   so it never lags or re-eases. */
 .bird--scroll-timeline {
   animation: bird-flight linear both;
   animation-timeline: scroll(root block);
@@ -98,31 +242,51 @@ body {
     transform: translate3d(74vw, 10px, 0) rotate(-3deg);
   }
   100% {
-    transform: translate3d(calc(100vw - 128px), 0, 0) rotate(-2deg);
+    transform: translate3d(calc(100vw - 96px), 0, 0) rotate(-2deg);
   }
 }
 
-@keyframes wing-flap {
-  50% {
-    transform: rotate(-30deg) scaleY(0.82);
+/* A perched bird that has been sent: it hops off, crosses the page in an arc, and is gone. */
+.flying {
+  animation: fly-across 2.6s cubic-bezier(0.35, 0.1, 0.3, 1) var(--fly-delay, 0s) both;
+}
+
+@keyframes fly-across {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  14% {
+    transform: translate3d(var(--fly-dir-x, 10%), -28px, 0) rotate(-9deg);
+  }
+  62% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(var(--fly-x, 80vw), var(--fly-y, -40vh), 0) rotate(7deg);
+    opacity: 0;
   }
 }
 
-.bird__wing {
-  transform-origin: 68% 92%;
-  animation: wing-flap 0.22s ease-in-out infinite;
+/* Paused: branches hold their sway, wings stop, leaves freeze where they are. */
+.is-paused .branch-left-a,
+.is-paused .branch-left-b,
+.is-paused .branch-left-c,
+.is-paused .branch-right-a,
+.is-paused .branch-right-b,
+.is-paused .branch-right-c,
+.is-paused .leaf,
+.is-paused .marquee,
+.is-paused .flying {
+  animation-play-state: paused !important;
 }
 
-/* The bird and the branches cross cream, orange and ink bands as the page scrolls. A cream halo
-   keeps the silhouette readable on the two dark ones without changing its colour. */
 .forest-ink {
-  filter: drop-shadow(0 0 6px rgba(255, 242, 214, 0.9)) drop-shadow(0 0 2px rgba(255, 242, 214, 0.9));
+  filter: drop-shadow(0 0 6px var(--halo)) drop-shadow(0 0 2px var(--halo));
 }
 
 /* ---- Story steps ------------------------------------------------------------------------- */
 
-/* Each beat lifts into place as it enters the viewport. Without `view()` support the markup sits
-   at its finished state, which is exactly what a static reading wants. */
 .reveal {
   opacity: 1;
 }
@@ -147,12 +311,17 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .bird--scroll-timeline {
-    animation: none;
-  }
-
-  .bird__wing {
-    animation: none;
+  .bird--scroll-timeline,
+  .marquee,
+  .leaf,
+  .branch-left-a,
+  .branch-left-b,
+  .branch-left-c,
+  .branch-right-a,
+  .branch-right-b,
+  .branch-right-c,
+  .flying {
+    animation: none !important;
   }
 
   @supports (animation-timeline: view()) {
@@ -167,18 +336,18 @@ body {
 /* A pastel card that sits on the page like a cut-out: solid ink edge, a hard shadow, a touch of
    rotation applied inline per card. */
 .sticker-card {
-  border: 2px solid #163b36;
+  border: 2px solid rgb(var(--ink-rgb));
   border-radius: 18px;
-  box-shadow: 4px 4px 0 #163b36;
+  box-shadow: 4px 4px 0 rgb(var(--ink-rgb));
 }
 
 .sticker-card:hover {
-  box-shadow: 7px 7px 0 #163b36;
+  box-shadow: 7px 7px 0 rgb(var(--ink-rgb));
 }
 
 /* Dotted rules used to separate editorial columns. */
 .rule-dots {
-  background-image: radial-gradient(circle, #163b36 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgb(var(--ink-rgb)) 1px, transparent 1px);
   background-size: 8px 8px;
   background-repeat: repeat-x;
   height: 4px;

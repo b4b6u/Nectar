@@ -171,7 +171,7 @@ export default function DownloadStepsPage() {
 
       <main className="mx-auto max-w-shell px-5 pb-24 sm:px-6">
         <section className="mx-auto max-w-3xl pt-12 text-center sm:pt-16">
-          <p className="mb-6 inline-block rotate-[-1.5deg] border-2 border-ink bg-blush px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.24em]">
+          <p className="mb-6 inline-block rotate-[-1.5deg] border-2 border-ink bg-blush px-3 py-1 text-inkSolid text-[10.5px] font-bold uppercase tracking-[0.24em]">
             Before you install
           </p>
           <h1 className="font-display text-[clamp(2.4rem,6.4vw,5rem)] uppercase leading-[0.94]">
@@ -218,7 +218,7 @@ export default function DownloadStepsPage() {
         {/* Reassurance */}
         <section className="mt-20 grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:gap-14">
           <div>
-            <p className="mb-4 inline-block rotate-[-1.5deg] border-2 border-ink bg-sun px-2.5 py-1 text-[10.5px] font-bold uppercase tracking-[0.24em]">
+            <p className="mb-4 inline-block rotate-[-1.5deg] border-2 border-ink bg-sun px-2.5 py-1 text-inkSolid text-[10.5px] font-bold uppercase tracking-[0.24em]">
               Why you are seeing this
             </p>
             <h2 className="font-display text-[clamp(1.9rem,4vw,3rem)] uppercase leading-[0.9]">
@@ -248,7 +248,7 @@ export default function DownloadStepsPage() {
 
         {/* Verification */}
         <section className="mt-20 rounded-sticker border-2 border-ink bg-paperDeep p-6 shadow-sticker sm:p-10">
-          <p className="mb-4 inline-block rotate-[-1.5deg] border-2 border-ink bg-leaf px-2.5 py-1 text-[10.5px] font-bold uppercase tracking-[0.24em]">
+          <p className="mb-4 inline-block rotate-[-1.5deg] border-2 border-ink bg-leaf px-2.5 py-1 text-inkSolid text-[10.5px] font-bold uppercase tracking-[0.24em]">
             Check it is really us
           </p>
           <h2 className="font-display text-shout uppercase leading-[0.9]">
@@ -294,11 +294,11 @@ export default function DownloadStepsPage() {
           <p className="mx-auto mt-4 max-w-lg text-[15px] leading-relaxed text-muted">
             The download is small, the install takes under a minute, and Nectar opens quietly in the
             notch — press{" "}
-            <kbd className="rounded border-2 border-ink bg-sun px-1.5 py-0.5 font-mono text-[12px]">
+            <kbd className="rounded border-2 border-ink bg-sun px-1.5 py-0.5 text-inkSolid font-mono text-[12px]">
               Alt
             </kbd>{" "}
             +{" "}
-            <kbd className="rounded border-2 border-ink bg-sun px-1.5 py-0.5 font-mono text-[12px]">
+            <kbd className="rounded border-2 border-ink bg-sun px-1.5 py-0.5 text-inkSolid font-mono text-[12px]">
               N
             </kbd>{" "}
             to bring it down.

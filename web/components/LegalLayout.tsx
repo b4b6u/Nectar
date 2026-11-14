@@ -21,7 +21,7 @@ export default function LegalLayout({ title, lede, updated, toc, children }: Pro
 
       <main className="mx-auto max-w-shell px-5 pb-24 sm:px-6">
         <header className="max-w-3xl pt-12 sm:pt-16">
-          <p className="mb-5 inline-block rotate-[-1.5deg] border-2 border-ink bg-sun px-2.5 py-1 text-[10.5px] font-bold uppercase tracking-[0.24em]">
+          <p className="mb-5 inline-block rotate-[-1.5deg] border-2 border-ink bg-sun px-2.5 py-1 text-inkSolid text-[10.5px] font-bold uppercase tracking-[0.24em]">
             Legal
           </p>
           <h1 className="font-display text-[clamp(2.6rem,7vw,5.2rem)] uppercase leading-[0.86]">

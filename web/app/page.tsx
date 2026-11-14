@@ -5,7 +5,6 @@
  */
 
 import Image from "next/image";
-import ForestJourney from "../components/ForestJourney";
 import SiteFooter from "../components/SiteFooter";
 import SiteHeader from "../components/SiteHeader";
 
@@ -190,7 +189,7 @@ function SplitSection({
       className="mx-auto grid max-w-shell scroll-mt-24 items-center gap-10 px-5 py-16 sm:px-6 lg:grid-cols-2 lg:gap-16"
     >
       <div className={flip ? "lg:order-2" : undefined}>
-        <Kicker className="mb-4 inline-block rotate-[-1.5deg] border-2 border-ink bg-sun px-2.5 py-1">
+        <Kicker className="mb-4 inline-block rotate-[-1.5deg] border-2 border-ink bg-sun px-2.5 py-1 text-inkSolid">
           {eyebrow}
         </Kicker>
         <h2 className="m-0 font-display text-[clamp(2rem,4.6vw,3.4rem)] uppercase leading-[0.9]">
@@ -220,7 +219,6 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(STRUCTURED_DATA) }}
       />
       <SiteHeader />
-      <ForestJourney />
 
       <main>
         {/* Hero */}
@@ -287,7 +285,7 @@ export default function Home() {
         </section>
 
         {/* Ticker */}
-        <div className="overflow-hidden border-y-2 border-ink bg-leaf py-2.5">
+        <div className="overflow-hidden border-y-2 border-ink bg-leaf py-2.5 text-inkSolid">
           <div className="marquee">
             {[0, 1].map((copy) => (
               <div
@@ -310,7 +308,7 @@ export default function Home() {
         <section id="story" className="px-5 py-20 sm:px-6">
           <div className="mx-auto max-w-shell">
             <div className="mx-auto max-w-3xl text-center">
-              <Kicker className="inline-block rotate-[-1.5deg] border-2 border-ink bg-leaf px-2.5 py-1">
+              <Kicker className="inline-block rotate-[-1.5deg] border-2 border-ink bg-leaf px-2.5 py-1 text-inkSolid">
                 The story
               </Kicker>
               <h2 className="mt-5 font-display text-shout uppercase leading-[0.94]">
@@ -372,7 +370,7 @@ export default function Home() {
               {FEATURES.map((feature, index) => (
                 <article
                   key={feature.title}
-                  className="sticker-card flex flex-col p-6 text-ink transition-transform duration-200 hover:-translate-y-1"
+                  className="sticker-card flex flex-col p-6 text-inkSolid transition-transform duration-200 hover:-translate-y-1"
                   style={{ backgroundColor: feature.fill, transform: `rotate(${feature.rotate})` }}
                 >
                   <span className="font-mono text-[11px] tracking-[0.1em] opacity-60">
@@ -382,10 +380,10 @@ export default function Home() {
                     {feature.title}
                   </h3>
                   <p className="mt-3 text-[13.5px] leading-relaxed">{feature.copy}</p>
-                  <ul className="mt-4 list-none space-y-1.5 border-t-2 border-ink/25 p-0 pt-3 text-[12.5px]">
+                  <ul className="mt-4 list-none space-y-1.5 border-t-2 border-inkSolid/25 p-0 pt-3 text-[12.5px]">
                     {feature.points.map((point) => (
                       <li key={point} className="flex gap-2">
-                        <span aria-hidden className="text-ink/60">
+                        <span aria-hidden className="text-inkSolid/60">
                           &rarr;
                         </span>
                         {point}
@@ -406,7 +404,7 @@ export default function Home() {
         <section className="px-5 py-20 sm:px-6">
           <div className="mx-auto max-w-shell">
             <div className="max-w-2xl">
-              <Kicker className="mb-4 inline-block rotate-[-1.5deg] border-2 border-ink bg-blush px-2.5 py-1">
+              <Kicker className="mb-4 inline-block rotate-[-1.5deg] border-2 border-ink bg-blush px-2.5 py-1 text-inkSolid">
                 Getting in
               </Kicker>
               <h2 className="font-display text-shout uppercase leading-[0.9]">
@@ -422,7 +420,7 @@ export default function Home() {
             <ol className="mt-10 grid list-none grid-cols-1 gap-6 p-0 sm:grid-cols-3">
               {ENTRIES.map((entry, index) => (
                 <li key={entry.key} className="sticker-card bg-paper p-6">
-                  <span className="rounded-full border-2 border-ink bg-sun px-3 py-1 font-mono text-[11px]">
+                  <span className="rounded-full border-2 border-ink bg-sun px-3 py-1 text-inkSolid font-mono text-[11px]">
                     {entry.key}
                   </span>
                   <h3 className="mt-4 font-display text-[26px] uppercase leading-none">
@@ -580,7 +578,7 @@ export default function Home() {
               </ol>
 
               <a
-                className="mt-9 inline-block rounded-full border-2 border-paper bg-orange px-8 py-3.5 text-[12px] font-bold uppercase tracking-[0.16em] text-paper shadow-[4px_4px_0_#fff2d6] transition-transform hover:-translate-y-0.5 hover:bg-red"
+                className="mt-9 inline-block rounded-full border-2 border-paper bg-orange px-8 py-3.5 text-[12px] font-bold uppercase tracking-[0.16em] text-paper shadow-[4px_4px_0_rgb(var(--paper-rgb))] transition-transform hover:-translate-y-0.5 hover:bg-red"
                 href="/download-steps"
               >
                 Install on Windows
