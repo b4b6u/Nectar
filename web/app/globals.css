@@ -188,101 +188,48 @@ body {
   }
 }
 
-/* Leaves fall on their own clocks, drifting a little to one side as they turn. */
-.leaf {
-  animation-name: leaf-fall;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-  will-change: transform, opacity;
-}
-
-@keyframes leaf-fall {
+/* A branch that has just been landed on or left shakes itself out. */
+@keyframes branch-rustle {
   0% {
-    transform: translate3d(0, -10vh, 0) rotate(0deg);
-    opacity: 0;
-  }
-  10% {
-    opacity: 0.92;
-  }
-  50% {
-    transform: translate3d(calc(18px * var(--drift, 1)), 52vh, 0) rotate(190deg);
-  }
-  90% {
-    opacity: 0.75;
-  }
-  100% {
-    transform: translate3d(calc(-12px * var(--drift, 1)), 104vh, 0) rotate(370deg);
-    opacity: 0;
-  }
-}
-
-/* The whole-document timeline: the traveller leaves the left branch at the top of the page and
-   lands on the right one at the bottom. Scroll timelines pin the transform to the scroll position,
-   so it never lags or re-eases. */
-.bird--scroll-timeline {
-  animation: bird-flight linear both;
-  animation-timeline: scroll(root block);
-  will-change: transform;
-}
-
-@keyframes bird-flight {
-  0% {
-    transform: translate3d(0, 0, 0) rotate(-6deg);
+    transform: rotate(0deg);
   }
   20% {
-    transform: translate3d(18vw, -24px, 0) rotate(5deg);
+    transform: rotate(2.6deg);
   }
-  40% {
-    transform: translate3d(37vw, 14px, 0) rotate(-4deg);
+  45% {
+    transform: rotate(-1.9deg);
   }
-  60% {
-    transform: translate3d(56vw, -20px, 0) rotate(6deg);
-  }
-  80% {
-    transform: translate3d(74vw, 10px, 0) rotate(-3deg);
+  70% {
+    transform: rotate(1.1deg);
   }
   100% {
-    transform: translate3d(calc(100vw - 96px), 0, 0) rotate(-2deg);
+    transform: rotate(0deg);
   }
 }
 
-/* A perched bird that has been sent: it hops off, crosses the page in an arc, and is gone. */
-.flying {
-  animation: fly-across 2.6s cubic-bezier(0.35, 0.1, 0.3, 1) var(--fly-delay, 0s) both;
+/* The little note that floats off a bird when it sings. */
+.chirp-note {
+  animation: chirp-float 1.35s ease-out forwards;
 }
 
-@keyframes fly-across {
+@keyframes chirp-float {
   0% {
-    transform: translate3d(0, 0, 0) rotate(0deg);
-    opacity: 1;
+    opacity: 0;
+    transform: translateY(4px) scale(0.75) rotate(-8deg);
   }
-  14% {
-    transform: translate3d(var(--fly-dir-x, 10%), -28px, 0) rotate(-9deg);
-  }
-  62% {
+  25% {
     opacity: 1;
+    transform: translate(5px, -8px) scale(1.05) rotate(6deg);
   }
   100% {
-    transform: translate3d(var(--fly-x, 80vw), var(--fly-y, -40vh), 0) rotate(7deg);
     opacity: 0;
+    transform: translate(12px, -26px) scale(0.92) rotate(-6deg);
   }
 }
 
-/* Paused: branches hold their sway, wings stop, leaves freeze where they are. */
-.is-paused .branch-left-a,
-.is-paused .branch-left-b,
-.is-paused .branch-left-c,
-.is-paused .branch-right-a,
-.is-paused .branch-right-b,
-.is-paused .branch-right-c,
-.is-paused .leaf,
-.is-paused .marquee,
-.is-paused .flying {
+/* Paused: branches hold their sway, and the flock stops where it is. */
+.branch-paused {
   animation-play-state: paused !important;
-}
-
-.forest-ink {
-  filter: drop-shadow(0 0 6px var(--halo)) drop-shadow(0 0 2px var(--halo));
 }
 
 /* ---- Story steps ------------------------------------------------------------------------- */
@@ -311,16 +258,13 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .bird--scroll-timeline,
   .marquee,
-  .leaf,
   .branch-left-a,
   .branch-left-b,
   .branch-left-c,
   .branch-right-a,
   .branch-right-b,
-  .branch-right-c,
-  .flying {
+  .branch-right-c {
     animation: none !important;
   }
 
