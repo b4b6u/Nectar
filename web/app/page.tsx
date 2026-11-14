@@ -5,6 +5,7 @@
  */
 
 import Image from "next/image";
+import ForestJourney from "../components/ForestJourney";
 import SiteFooter from "../components/SiteFooter";
 import SiteHeader from "../components/SiteHeader";
 
@@ -57,6 +58,34 @@ const TICKER = [
   "No Electron",
   "No web view",
   "C# · .NET 8 · WinUI 3"
+] as const;
+
+/** The four beats of the story the hummingbird carries across the page. */
+const STORY = [
+  {
+    number: "01",
+    tag: "The dart",
+    title: "Attention darts.",
+    copy: "A notification, an open tab, a chime from a calendar you forgot you linked. Every ping is a flower worth checking, and none of them are the thing you sat down to do."
+  },
+  {
+    number: "02",
+    tag: "The branch",
+    title: "Find one place to land.",
+    copy: "Alt + N drops a single strip out of the top edge: tasks, a timer, a note, today. It never covers the app you are working in and never takes your keyboard away from it."
+  },
+  {
+    number: "03",
+    tag: "The hold",
+    title: "Twenty-five minutes, one task.",
+    copy: "The countdown runs from a deadline rather than from ticks, so a busy machine cannot make it drift. Nothing in the strip rewards you for checking something else."
+  },
+  {
+    number: "04",
+    tag: "The return",
+    title: "The branch stays.",
+    copy: "Tick the rows off, close the note, fold the notch back into the edge. Nothing to maintain, nothing to log into — the next dithering spell already has somewhere to go."
+  }
 ] as const;
 
 const FEATURES = [
@@ -191,6 +220,7 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(STRUCTURED_DATA) }}
       />
       <SiteHeader />
+      <ForestJourney />
 
       <main>
         {/* Hero */}
@@ -275,6 +305,52 @@ export default function Home() {
             ))}
           </div>
         </div>
+
+        {/* The story the bird is telling */}
+        <section id="story" className="px-5 py-20 sm:px-6">
+          <div className="mx-auto max-w-shell">
+            <div className="mx-auto max-w-3xl text-center">
+              <Kicker className="inline-block rotate-[-1.5deg] border-2 border-ink bg-leaf px-2.5 py-1">
+                The story
+              </Kicker>
+              <h2 className="mt-5 font-display text-shout uppercase leading-[0.94]">
+                Reclaiming focus, one branch at a time.
+              </h2>
+              <p className="mx-auto mt-5 max-w-lg text-[16px] leading-relaxed text-muted">
+                A hummingbird never holds still for long — it darts, hovers, darts again. So does
+                attention. Nectar is not a cage for it; it is one branch worth coming back to, and
+                this bird is on its way across the page to prove it.
+              </p>
+            </div>
+
+            <ol className="mt-14 grid list-none grid-cols-1 gap-6 p-0 md:grid-cols-2">
+              {STORY.map((beat, index) => (
+                <li
+                  key={beat.number}
+                  className="reveal sticker-card bg-paper p-7"
+                  style={{ transform: index % 2 ? "rotate(0.6deg)" : "rotate(-0.6deg)" }}
+                >
+                  <div className="flex items-baseline gap-3">
+                    <span className="font-display text-[40px] uppercase leading-none text-orange">
+                      {beat.number}
+                    </span>
+                    <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-ink/50">
+                      {beat.tag}
+                    </span>
+                  </div>
+                  <h3 className="mt-3 font-display text-[27px] uppercase leading-none">
+                    {beat.title}
+                  </h3>
+                  <p className="m-0 mt-3 text-[14px] leading-relaxed text-muted">{beat.copy}</p>
+                </li>
+              ))}
+            </ol>
+
+            <p className="mt-12 text-center text-[10.5px] font-bold uppercase tracking-[0.2em] text-muted">
+              The bird flies left to right as you read &middot; the forest button turns the sound on
+            </p>
+          </div>
+        </section>
 
         {/* The workspace — the loud orange scene */}
         <section id="workspace" className="scroll-mt-24 bg-orange px-5 py-20 text-paper sm:px-6">

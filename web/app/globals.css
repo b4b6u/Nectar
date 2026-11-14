@@ -70,6 +70,98 @@ body {
   }
 }
 
+/* ---- The hummingbird --------------------------------------------------------------------- */
+
+/* The whole document is the timeline: the bird leaves the left branch at the top of the page and
+   lands on the right one at the bottom, wherever the reader happens to be. Scroll timelines pin
+   the transform to the scroll position, so it never lags or re-eases. */
+.bird--scroll-timeline {
+  animation: bird-flight linear both;
+  animation-timeline: scroll(root block);
+  will-change: transform;
+}
+
+@keyframes bird-flight {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(-6deg);
+  }
+  20% {
+    transform: translate3d(18vw, -24px, 0) rotate(5deg);
+  }
+  40% {
+    transform: translate3d(37vw, 14px, 0) rotate(-4deg);
+  }
+  60% {
+    transform: translate3d(56vw, -20px, 0) rotate(6deg);
+  }
+  80% {
+    transform: translate3d(74vw, 10px, 0) rotate(-3deg);
+  }
+  100% {
+    transform: translate3d(calc(100vw - 128px), 0, 0) rotate(-2deg);
+  }
+}
+
+@keyframes wing-flap {
+  50% {
+    transform: rotate(-30deg) scaleY(0.82);
+  }
+}
+
+.bird__wing {
+  transform-origin: 68% 92%;
+  animation: wing-flap 0.22s ease-in-out infinite;
+}
+
+/* The bird and the branches cross cream, orange and ink bands as the page scrolls. A cream halo
+   keeps the silhouette readable on the two dark ones without changing its colour. */
+.forest-ink {
+  filter: drop-shadow(0 0 6px rgba(255, 242, 214, 0.9)) drop-shadow(0 0 2px rgba(255, 242, 214, 0.9));
+}
+
+/* ---- Story steps ------------------------------------------------------------------------- */
+
+/* Each beat lifts into place as it enters the viewport. Without `view()` support the markup sits
+   at its finished state, which is exactly what a static reading wants. */
+.reveal {
+  opacity: 1;
+}
+
+@supports (animation-timeline: view()) {
+  .reveal {
+    animation: reveal-up linear both;
+    animation-timeline: view();
+    animation-range: entry 8% cover 34%;
+  }
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bird--scroll-timeline {
+    animation: none;
+  }
+
+  .bird__wing {
+    animation: none;
+  }
+
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: none;
+    }
+  }
+}
+
 /* ---- Stickers ---------------------------------------------------------------------------- */
 
 /* A pastel card that sits on the page like a cut-out: solid ink edge, a hard shadow, a touch of
