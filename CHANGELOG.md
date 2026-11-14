@@ -3,7 +3,7 @@
 What changed in each released build of Nectar. Dates are the day the release was published.
 Downloads live at <https://github.com/b4b6u/Nectar/releases>.
 
-## [1.0.2] — 2026-11-14
+## [1.0.3] — 2026-11-14
 
 ### Added
 
@@ -40,6 +40,34 @@ Downloads live at <https://github.com/b4b6u/Nectar/releases>.
 - `Settings/ThemeIds.cs` holds the four ids without any WinUI types, so `dotnet test` covers the
   normalization rules; `Services/AppTheme.cs` owns the colours and repaints the existing brushes in
   place rather than rebuilding the windows.
+
+### The website, rebuilt around the app
+
+- **Fig. 01 is the workspace itself now.** The hero demo renders the app's real 1000 × 340 surface
+  at its own measurements — the 34 px header, four 239 px cards with 13/10 padding and 18 px
+  corners, the XAML type scale (13.5 titles, 12 rows, 10.5 chips, 9.5 meta, 48 Consolas countdown)
+  and the brushed card colours — and scales as one piece, so its proportions never drift. Tasks,
+  the timer, the note, the event bells and the three tabs are all live.
+- The story page has the hummingbird's flock, the branches, the drifting leaves, a night palette
+  and three densities, so the forest stands back on a phone instead of crowding the type.
+- Removed the hero's platform line, the promises ticker, the "Vol. 01 / The workspace" label and
+  the bird caption: decoration that repeated what the cards already say. The footer now carries
+  the app mark beside the wordmark, like the masthead.
+- The dark palette's accent ink is darker, so links and step numerals stay legible on cream.
+
+### Download and API hardening
+
+- The setup-exe redirect (`/download/windows`) was an unauthenticated GitHub API call per request.
+  It now has its own per-client budget and a 30-second resolved-asset cache, so a loop against the
+  button cannot drain the quota the installer feed also needs.
+- Release tags are escaped before they reach the feed's HTML status pages.
+- The feed rate limiter keys on `x-vercel-forwarded-for` and the rightmost forwarded hop, so a
+  proxy in front of the site cannot turn the per-client budget into a client-chosen one.
+
+### Notes
+
+- 1.0.2 was stamped in the project and superseded before a release was cut, so this is the first
+  published build that carries the settings window and the four themes.
 
 ## [1.0.1] — 2026-11-13
 
@@ -93,5 +121,6 @@ First release.
 - The website moved into the `web/` Next app: landing page, install walk-through, privacy and
   licence pages, and the routes that serve the MSIX feed and the download redirect.
 
+[1.0.3]: https://github.com/b4b6u/Nectar/releases/tag/v1.0.3
 [1.0.1]: https://github.com/b4b6u/Nectar/releases/tag/v1.0.1
 [1.0.0]: https://github.com/b4b6u/Nectar/releases/tag/v1.0.0
