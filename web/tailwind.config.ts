@@ -24,6 +24,7 @@ const config: Config = {
         red: "rgb(var(--red-rgb) / <alpha-value>)",
         leaf: "rgb(var(--leaf-rgb) / <alpha-value>)",
         sun: "rgb(var(--sun-rgb) / <alpha-value>)",
+        inkAccent: "rgb(var(--ink-accent-rgb) / <alpha-value>)",
         blush: "rgb(var(--blush-rgb) / <alpha-value>)",
         sage: "#8DBA98",
         lavender: "#A39CD0",

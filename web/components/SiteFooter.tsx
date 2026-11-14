@@ -17,13 +17,13 @@ export default function SiteFooter() {
         </p>
 
         <nav aria-label="Footer" className="flex flex-wrap gap-5 text-[11px] uppercase tracking-[0.16em]">
-          <Link className="transition-colors hover:text-sun" href="/download-steps">
+          <Link className="transition-colors hover:text-inkAccent" href="/download-steps">
             Install
           </Link>
-          <Link className="transition-colors hover:text-sun" href="/privacy">
+          <Link className="transition-colors hover:text-inkAccent" href="/privacy">
             Privacy
           </Link>
-          <Link className="transition-colors hover:text-sun" href="/licence">
+          <Link className="transition-colors hover:text-inkAccent" href="/licence">
             Licence
           </Link>
         </nav>

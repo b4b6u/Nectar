@@ -545,7 +545,10 @@ export default function Home() {
                 One setup file and nothing to hunt down: Nectar brings its own .NET runtime and
                 Windows App SDK. It installs for your Windows user, so there is no administrator
                 prompt — Windows only asks once whether you trust the file;{" "}
-                <a className="text-sun underline decoration-sun/40 underline-offset-4" href="/download-steps">
+                <a
+                  className="font-semibold text-inkAccent underline decoration-inkAccent/45 decoration-2 underline-offset-4 transition-colors hover:decoration-inkAccent"
+                  href="/download-steps"
+                >
                   here is exactly what to click
                 </a>
                 .
@@ -558,7 +561,7 @@ export default function Home() {
                   "Press Alt + N. It starts hidden in the notch."
                 ].map((step, index) => (
                   <li key={step} className="border-t-2 border-paper/25 pt-3 text-[13px] leading-relaxed text-paper/80">
-                    <span className="block font-display text-[32px] uppercase leading-none text-leaf">
+                    <span className="block font-display text-[32px] uppercase leading-none text-inkAccent">
                       0{index + 1}
                     </span>
                     <span className="mt-2 block">{step}</span>
