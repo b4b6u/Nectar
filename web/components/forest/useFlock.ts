@@ -39,6 +39,19 @@ export const PERCHES: Perch[] = [
 ];
 
 const PERCH_BY_ID = Object.fromEntries(PERCHES.map((perch) => [perch.id, perch])) as Record<string, Perch>;
+
+/**
+ * On phones the middle branch pair is hidden — it would sit on the centred copy — so the flock is
+ * told the same thing and stops choosing the perches drawn on it.
+ */
+let midBranchesHidden = false;
+
+export function setMidBranchesHidden(hidden: boolean) {
+  midBranchesHidden = hidden;
+}
+
+const onHiddenBranch = (perchId: string) =>
+  midBranchesHidden && (PERCH_BY_ID[perchId]?.branchId.endsWith("-mid") ?? false);
 const DEBRIS = ["#b8cd49", "#8fc19a", "#f5b6bf", "#ffcf4a", "#f6572d"];
 
 type Point = { x: number; y: number };
@@ -201,8 +214,9 @@ export function useFlock() {
     const taken = new Set(
       birds.current.filter((bird) => bird.id !== birdId).map((bird) => (bird.state === "flying" ? bird.targetPerchId : bird.perchId))
     );
-    const free = PERCHES.filter((perch) => perch.side === side && !taken.has(perch.id));
-    const options = free.length > 0 ? free : PERCHES.filter((perch) => perch.side === side);
+    const usable = PERCHES.filter((perch) => perch.side === side && !onHiddenBranch(perch.id));
+    const free = usable.filter((perch) => !taken.has(perch.id));
+    const options = free.length > 0 ? free : usable;
     return options[Math.floor(Math.random() * options.length)].id;
   }, []);
 
@@ -250,9 +264,15 @@ export function useFlock() {
   // Build the roster once the branch art is in the document, so perch lookups have something to hit.
   useEffect(() => {
     const now = performance.now();
-    const scale = window.innerWidth < 640 ? 0.78 : 1;
+    // The middle branches are only drawn on a wide desktop, so narrower screens keep six birds.
+    const narrow = window.innerWidth < 1024;
+    const compact = window.innerWidth < 640;
+    const scale = compact ? 0.62 : narrow ? 0.78 : 1;
 
-    const flock: Bird[] = ROSTER.map((entry, index) => {
+    setMidBranchesHidden(narrow);
+    const roster = narrow ? ROSTER.filter((entry) => !PERCH_BY_ID[entry.perchId].branchId.endsWith("-mid")) : ROSTER;
+
+    const flock: Bird[] = roster.map((entry, index) => {
       const at = perchPoint(entry.perchId);
       const side = PERCH_BY_ID[entry.perchId].side;
       return {
@@ -432,9 +452,30 @@ export function useFlock() {
   // Resize: sizes follow the breakpoint, perched birds re-seat themselves.
   useEffect(() => {
     const onResize = () => {
-      const scale = window.innerWidth < 640 ? 0.78 : 1;
+      const narrow = window.innerWidth < 1024;
+      const compact = window.innerWidth < 640;
+      const scale = compact ? 0.62 : narrow ? 0.78 : 1;
+
+      // A bird perched on the middle branch would be left standing on nothing once it is hidden.
+      setMidBranchesHidden(narrow);
+
       birds.current.forEach((bird) => {
         bird.size = Math.round((bird.species === "hummingbird" ? 64 : 58) * scale);
+
+        if (narrow && PERCH_BY_ID[bird.perchId]?.branchId.endsWith("-mid")) {
+          const taken = new Set(birds.current.filter((other) => other.id !== bird.id).map((other) => other.perchId));
+          const side = PERCH_BY_ID[bird.perchId].side;
+          const free = PERCHES.find(
+            (perch) => perch.side === side && !perch.branchId.endsWith("-mid") && !taken.has(perch.id)
+          );
+
+          if (free) {
+            bird.perchId = free.id;
+            bird.targetPerchId = free.id;
+            bird.state = "perched";
+          }
+        }
+
         if (bird.state === "perched") {
           const at = perchPoint(bird.perchId);
           bird.x = at.x;

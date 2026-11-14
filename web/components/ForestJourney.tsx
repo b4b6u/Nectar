@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Bird from "./forest/Bird";
 import { BRANCHES, LEAVES, VINE_LEFT, VINE_RIGHT } from "./forest/art";
-import { useFlock } from "./forest/useFlock";
+import { setMidBranchesHidden, useFlock } from "./forest/useFlock";
 
 /**
  * The forest.
@@ -26,6 +26,22 @@ const BRANCH_IDS = {
 
 const LEAF_COLOURS = Object.keys(LEAVES);
 
+/**
+ * The forest is drawn at full size only where the page keeps a wide margin either side of the copy.
+ * Below 1024 px the middle pair and its perches step aside and the two that stay shrink to edge
+ * ornaments; below 640 px they shrink again and tuck further out, so nothing sits on a line.
+ */
+const PHONE = "(max-width: 639px)";
+const TABLET = "(min-width: 640px) and (max-width: 1023px)";
+
+type Density = "desktop" | "tablet" | "phone";
+
+const BRANCH_WIDTH: Record<Exclude<Density, "desktop">, string[]> = {
+  tablet: ["w-[96px]", "w-[0px]", "w-[88px]"],
+  phone: ["w-[68px]", "w-[0px]", "w-[62px]"]
+};
+const MID_PERCHES = new Set(["left-2", "left-3", "right-2", "right-3"]);
+
 /** Ambient leaves: fourteen of them, each on its own delay, speed, drift and size. */
 const FALLING = Array.from({ length: 14 }, (_, i) => ({
   id: i,
@@ -40,6 +56,26 @@ const FALLING = Array.from({ length: 14 }, (_, i) => ({
 export default function ForestJourney() {
   const { birds, particles, rustling, paused, setPaused, callsOn, setCallsOn, poke, sendFlock } = useFlock();
   const [dark, setDark] = useState(false);
+  const [density, setDensity] = useState<Density>("desktop");
+
+  useEffect(() => {
+    const phone = window.matchMedia(PHONE);
+    const tablet = window.matchMedia(TABLET);
+
+    const sync = () => {
+      const next: Density = phone.matches ? "phone" : tablet.matches ? "tablet" : "desktop";
+      setDensity(next);
+      setMidBranchesHidden(next !== "desktop");
+    };
+
+    sync();
+    phone.addEventListener("change", sync);
+    tablet.addEventListener("change", sync);
+    return () => {
+      phone.removeEventListener("change", sync);
+      tablet.removeEventListener("change", sync);
+    };
+  }, []);
 
   useEffect(() => {
     setDark(document.documentElement.classList.contains("dark"));
@@ -81,7 +117,9 @@ export default function ForestJourney() {
               key={`${side}-${index}`}
               className={`branch-${side}-${["a", "b", "c"][index]} ${paused ? "branch-paused" : ""} absolute ${
                 side === "left" ? "-left-1" : "-right-1"
-              } ${branch.width} ${branch.placement}`}
+              } ${density === "desktop" ? branch.width : BRANCH_WIDTH[density][index]} ${
+                density === "phone" && index === 2 ? "bottom-[-18px]" : branch.placement
+              } ${density !== "desktop" && index === 1 ? "hidden" : ""}`}
             >
               <div
                 className={side === "left" ? "origin-left transition-transform duration-300" : "origin-right transition-transform duration-300"}
@@ -163,7 +201,9 @@ export default function ForestJourney() {
           })}
         </div>
 
-        {birds.map((bird) => {
+        {birds
+          .filter((bird) => !(density !== "desktop" && bird.state === "perched" && MID_PERCHES.has(bird.perchId)))
+          .map((bird) => {
           const flying = bird.state === "flying";
           const height = (bird.size * 68) / 80;
           const offsetX = bird.size * 0.5;
@@ -211,11 +251,11 @@ export default function ForestJourney() {
       {/* The controls. */}
       <div
         aria-label="Forest controls"
-        className="fixed bottom-4 right-4 z-40 flex items-center gap-1.5 rounded-full border-2 border-ink bg-paper/95 px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-ink shadow-sticker backdrop-blur sm:bottom-6 sm:right-6"
+        className="fixed bottom-3 right-3 z-40 flex items-center gap-1 rounded-full border-2 border-ink bg-paper/95 px-1.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-ink shadow-sticker backdrop-blur sm:bottom-6 sm:right-6 sm:gap-1.5 sm:px-2.5 sm:py-1.5 sm:text-[11px] sm:tracking-[0.14em]"
         role="group"
       >
         <button
-          className="flex items-center gap-1.5 rounded-full border border-ink bg-sun px-2.5 py-1 text-inkSolid transition-transform hover:-translate-y-0.5 hover:bg-leaf active:translate-y-0"
+          className="flex items-center gap-1 rounded-full border border-ink bg-sun px-2 py-0.5 text-inkSolid transition-transform hover:-translate-y-0.5 hover:bg-leaf active:translate-y-0 sm:gap-1.5 sm:px-2.5 sm:py-1"
           onClick={sendFlock}
           title="Send perched birds flying from one side to the other"
           type="button"
@@ -226,7 +266,7 @@ export default function ForestJourney() {
         </button>
         <button
           aria-pressed={callsOn}
-          className={`flex items-center gap-1 rounded-full border border-ink px-2.5 py-1 transition-colors ${
+          className={`flex items-center gap-1 rounded-full border border-ink px-2 py-0.5 transition-colors sm:px-2.5 sm:py-1 ${
             callsOn ? "bg-orange text-paperSolid" : "bg-paperDeep text-ink hover:bg-blush"
           }`}
           onClick={() => setCallsOn(!callsOn)}
@@ -237,18 +277,20 @@ export default function ForestJourney() {
           <span className="hidden sm:inline">{callsOn ? "Calls on" : "Calls off"}</span>
         </button>
         <button
+          aria-label={paused ? "Resume birds and branch sway" : "Pause birds and branch sway"}
           aria-pressed={paused}
-          className="rounded-full border border-ink bg-paper px-2.5 py-1 text-ink transition-colors hover:bg-paperDeep"
+          className="rounded-full border border-ink bg-paper px-2 py-0.5 text-ink transition-colors hover:bg-paperDeep sm:px-2.5 sm:py-1"
           onClick={() => setPaused(!paused)}
           title={paused ? "Resume birds & branch sway" : "Pause birds & branch sway"}
           type="button"
         >
-          {paused ? "Play" : "Pause"}
+          <span aria-hidden className="sm:hidden">{paused ? "▶" : "❙❙"}</span>
+          <span className="hidden sm:inline">{paused ? "Play" : "Pause"}</span>
         </button>
         <button
           aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
           aria-pressed={dark}
-          className="flex h-6 w-6 items-center justify-center rounded-full border border-ink bg-paper text-[13px] leading-none transition-colors hover:bg-paperDeep"
+          className="flex h-5 w-5 items-center justify-center rounded-full border border-ink bg-paper text-[12px] leading-none transition-colors hover:bg-paperDeep sm:h-6 sm:w-6 sm:text-[13px]"
           onClick={toggleTheme}
           title={dark ? "Switch to light mode" : "Switch to dark mode"}
           type="button"
