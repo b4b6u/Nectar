@@ -188,6 +188,35 @@ body {
   }
 }
 
+/* Ambient leaves drift down the viewport the whole time, on their own clocks, each drifting a
+   little to one side as it turns. */
+.leaf {
+  animation-name: leaf-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes leaf-fall {
+  0% {
+    transform: translate3d(0, -10vh, 0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.92;
+  }
+  50% {
+    transform: translate3d(calc(18px * var(--drift, 1)), 52vh, 0) rotate(190deg);
+  }
+  90% {
+    opacity: 0.75;
+  }
+  100% {
+    transform: translate3d(calc(-12px * var(--drift, 1)), 104vh, 0) rotate(370deg);
+    opacity: 0;
+  }
+}
+
 /* A branch that has just been landed on or left shakes itself out. */
 @keyframes branch-rustle {
   0% {
@@ -259,6 +288,7 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .marquee,
+  .leaf,
   .branch-left-a,
   .branch-left-b,
   .branch-left-c,

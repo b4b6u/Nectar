@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Bird from "./forest/Bird";
-import { BRANCHES, VINE_LEFT, VINE_RIGHT } from "./forest/art";
+import { BRANCHES, LEAVES, VINE_LEFT, VINE_RIGHT } from "./forest/art";
 import { useFlock } from "./forest/useFlock";
 
 /**
@@ -23,6 +23,19 @@ const BRANCH_IDS = {
   left: ["left-top", "left-mid", "left-low"],
   right: ["right-top", "right-mid", "right-low"]
 } as const;
+
+const LEAF_COLOURS = Object.keys(LEAVES);
+
+/** Ambient leaves: fourteen of them, each on its own delay, speed, drift and size. */
+const FALLING = Array.from({ length: 14 }, (_, i) => ({
+  id: i,
+  colour: LEAF_COLOURS[i % LEAF_COLOURS.length],
+  left: `${(i * 7.3 + (i % 3) * 11) % 96}%`,
+  delay: `${-(i * 1.37) % 12}s`,
+  duration: `${9 + (i % 5) * 2.4}s`,
+  drift: i % 2 === 0 ? 1 : -1,
+  size: 16 * (0.7 + ((i * 13) % 10) / 14)
+}));
 
 export default function ForestJourney() {
   const { birds, particles, rustling, paused, setPaused, callsOn, setCallsOn, poke, sendFlock } = useFlock();
@@ -87,6 +100,31 @@ export default function ForestJourney() {
 
       {/* Leaves, petals, sparks and the birds themselves. */}
       <div className="pointer-events-none fixed inset-0 z-30 select-none overflow-hidden">
+        {FALLING.map((leaf) => (
+          <span
+            aria-hidden
+            className="leaf pointer-events-none absolute top-0"
+            key={leaf.id}
+            style={
+              {
+                left: leaf.left,
+                width: `${leaf.size.toFixed(1)}px`,
+                animationDelay: leaf.delay,
+                animationDuration: leaf.duration,
+                animationPlayState: paused ? "paused" : "running",
+                "--drift": `${leaf.drift}`
+              } as React.CSSProperties
+            }
+          >
+            <svg
+              dangerouslySetInnerHTML={{ __html: LEAVES[leaf.colour] }}
+              height="100%"
+              viewBox="0 0 20 12"
+              width="100%"
+            />
+          </span>
+        ))}
+
         <div aria-hidden>
           {particles.map((particle) => {
             const life = Math.min(1, (now - particle.bornAt) / particle.lifeMs);
