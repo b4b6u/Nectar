@@ -264,7 +264,7 @@ export default function Home() {
           <figure className="relative mx-auto mt-14 max-w-[1000px]">
             <AppDemo />
             <figcaption className="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[10.5px] font-bold uppercase tracking-[0.16em] text-muted">
-              <span>Fig. 01 &mdash; the workspace, playable</span>
+              <span>Fig. 01 &mdash; the workspace, 1000 &times; 340 px, playable</span>
               <span aria-hidden className="text-orange">
                 &darr;&darr;&darr;
               </span>
