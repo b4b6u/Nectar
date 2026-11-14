@@ -44,6 +44,7 @@ const STRUCTURED_DATA = {
     "Self-saving scratchpad that lifts a line into Tasks with Ctrl+Enter",
     "Today's calendar from one linked Google or Microsoft account, with a reminder tray and snooze",
     "Seven-day Insights chart drawn natively from a local SQLite file",
+    "A settings window behind a gear beside the tabs, with four themes that repaint the app as you pick them",
     "Local-first storage: no account, no telemetry, DPAPI-encrypted calendar tokens"
   ]
 };
@@ -465,18 +466,19 @@ export default function Home() {
           id="customize"
           title="Set once, then forget it."
           paragraphs={[
-            "General holds the shortcut, the hover band, the pill switch and the calendar. Focus holds the session length, the completion sound, the chime volume and the expiry tray. Workspace holds card order and visibility.",
-            "Reset restores the layout and the focus defaults — your shortcut, your hover setting and your calendar link stay exactly where they were."
+            "General holds the shortcut, the hover band and the pill switch. Focus holds the session length, the completion sound, the chime volume and the expiry tray. Workspace holds card order and visibility.",
+            "The gear beside the tabs opens Settings: the calendar link, privacy and data, permissions and updates, a link to this page, and four themes — Paper, Meadow, Sunset and Midnight — that repaint both windows the moment you pick one. Reset to default restores the shipped cards, sounds and colours, and keeps your shortcut, your calendar link and your data."
           ]}
           caption={
             <>
-              Three cards, one file: everything lands in <code className="font-mono">settings.json</code>.
+              Three cards in the notch, one settings window behind the gear — and one file: everything
+              lands in <code className="font-mono">settings.json</code>.
             </>
           }
         >
           <div className="sticker-card overflow-hidden bg-ink">
             <Image
-              alt="Nectar's Customize view: a mint General card with shortcut, pill and calendar controls, a lilac Focus card, and a sky card for card order and visibility."
+              alt="Nectar's Customize view: a mint General card with the shortcut, hover and pill switches, a lilac Focus card, and a sky card for card order and visibility."
               className="h-auto w-full"
               height={480}
               src="/docs/nectar-customize.png"

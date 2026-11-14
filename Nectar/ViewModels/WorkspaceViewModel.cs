@@ -860,6 +860,35 @@ public sealed class WorkspaceViewModel : ObservableObject
         OnPropertyChanged(nameof(FocusMinutesLabel));
     }
 
+    // ======================================================================================
+    // Settings window: look
+    // ======================================================================================
+
+    /// <summary>The look the app wears; changing it repaints every open window immediately.</summary>
+    public string Theme
+    {
+        get => _settings.Theme;
+        set
+        {
+            var next = AppTheme.Normalize(value);
+            if (string.Equals(_settings.Theme, next, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            _settings.Theme = next;
+            _settingsStore.TrySave(_settings);
+            AppTheme.Apply(next);
+            OnPropertyChanged(nameof(Theme));
+            OnPropertyChanged(nameof(ThemeName));
+        }
+    }
+
+    public string ThemeName => AppTheme.NameOf(_settings.Theme);
+
+    /// <summary>Applies the saved look at startup, before the first window paints.</summary>
+    public void ApplySavedTheme() => AppTheme.Apply(_settings.Theme);
+
     public void MoveCard(int from, int to)
     {
         if (from < 0 || from >= CardRows.Count || to < 0 || to >= CardRows.Count || from == to)
@@ -896,6 +925,9 @@ public sealed class WorkspaceViewModel : ObservableObject
         OnPropertyChanged(nameof(ChimeVolume));
         OnPropertyChanged(nameof(ChimeVolumeLabel));
         OnPropertyChanged(nameof(ExpiryTray));
+        OnPropertyChanged(nameof(Theme));
+        OnPropertyChanged(nameof(ThemeName));
+        AppTheme.Apply(_settings.Theme);
         RaiseExtendChips();
         PersistCards();
     }

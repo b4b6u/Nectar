@@ -356,13 +356,26 @@
                         </StackPanel>
                     </Border>
 
-                    <Button
+                    <StackPanel
                         Grid.Column="4"
-                        Click="OnCollapseClick"
-                        Style="{StaticResource ShellIconButtonStyle}"
-                        ToolTipService.ToolTip="Close (Esc)">
-                        <FontIcon FontSize="10" Glyph="&#xE711;" />
-                    </Button>
+                        VerticalAlignment="Center"
+                        Orientation="Horizontal"
+                        Spacing="2">
+                        <Button
+                            x:Name="SettingsButton"
+                            AutomationProperties.Name="Open settings"
+                            Click="OnSettingsClick"
+                            Style="{StaticResource ShellIconButtonStyle}"
+                            ToolTipService.ToolTip="Settings">
+                            <FontIcon FontSize="12" Glyph="&#xE713;" />
+                        </Button>
+                        <Button
+                            Click="OnCollapseClick"
+                            Style="{StaticResource ShellIconButtonStyle}"
+                            ToolTipService.ToolTip="Close (Esc)">
+                            <FontIcon FontSize="10" Glyph="&#xE711;" />
+                        </Button>
+                    </StackPanel>
                 </Grid>
 
                 <!-- ===== Workspace view: the four lanes ===== -->
@@ -1286,171 +1299,9 @@
                                 Style="{StaticResource SettingHintTextStyle}"
                                 Text="Click the shortcut, then press the keys you want. Esc cancels." />
 
-                            <Border
-                                Height="1"
-                                Margin="0,2"
-                                Background="{StaticResource NectarInkFaintBrush}"
-                                Opacity="0.25" />
-
-                            <TextBlock Style="{StaticResource SettingsSectionHeaderTextStyle}" Text="CALENDAR" />
-
-                            <Grid ColumnSpacing="8">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Style="{StaticResource SettingLabelTextStyle}" Text="Linked calendar" />
-                                <Border
-                                    Grid.Column="1"
-                                    Padding="8,3"
-                                    Background="{StaticResource NectarChipBrush}"
-                                    CornerRadius="8">
-                                    <TextBlock Style="{StaticResource CardMetaTextStyle}" Text="{x:Bind ViewModel.CalendarLinkLabel, Mode=OneWay}" />
-                                </Border>
-                            </Grid>
-
-                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                <Button
-                                    AutomationProperties.Name="Link a calendar"
-                                    Click="OnOpenCalendarLinkClick"
-                                    Content="Link calendar"
-                                    Style="{StaticResource GhostActionButtonStyle}"
-                                    Visibility="{x:Bind ViewModel.CalendarLinkVisibility, Mode=OneWay}" />
-                                <Button
-                                    AutomationProperties.Name="Disconnect the calendar"
-                                    Click="OnDisconnectCalendarClick"
-                                    Content="Disconnect"
-                                    Style="{StaticResource GhostActionButtonStyle}"
-                                    Visibility="{x:Bind ViewModel.CalendarDisconnectVisibility, Mode=OneWay}" />
-                            </StackPanel>
-
-                            <StackPanel Spacing="7" Visibility="{x:Bind ViewModel.CalendarPanelVisibility, Mode=OneWay}">
-                                <Border
-                                    Padding="3"
-                                    HorizontalAlignment="Left"
-                                    Background="#26000000"
-                                    CornerRadius="13">
-                                    <StackPanel Orientation="Horizontal" Spacing="2">
-                                        <Button
-                                            AutomationProperties.Name="Use Google Calendar"
-                                            Background="{x:Bind ViewModel.GoogleChipBackground, Mode=OneWay}"
-                                            Click="OnCalendarProviderGoogleClick"
-                                            Content="Google"
-                                            Foreground="{x:Bind ViewModel.GoogleChipForeground, Mode=OneWay}"
-                                            Style="{StaticResource TrayChipButtonStyle}" />
-                                        <Button
-                                            AutomationProperties.Name="Use Microsoft Calendar"
-                                            Background="{x:Bind ViewModel.MicrosoftChipBackground, Mode=OneWay}"
-                                            Click="OnCalendarProviderMicrosoftClick"
-                                            Content="Microsoft"
-                                            Foreground="{x:Bind ViewModel.MicrosoftChipForeground, Mode=OneWay}"
-                                            Style="{StaticResource TrayChipButtonStyle}" />
-                                    </StackPanel>
-                                </Border>
-
-                                <Border
-                                    Padding="9,3"
-                                    Background="#59FFFFFF"
-                                    CornerRadius="9">
-                                    <TextBox
-                                        AutomationProperties.Name="OAuth client ID"
-                                        FontSize="10.5"
-                                        PlaceholderText="OAuth client ID"
-                                        Style="{StaticResource CardTextBoxStyle}"
-                                        Text="{x:Bind ViewModel.CalendarClientId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                </Border>
-
-                                <Border
-                                    Padding="9,3"
-                                    Background="#59FFFFFF"
-                                    CornerRadius="9"
-                                    Visibility="{x:Bind ViewModel.CalendarTenantVisibility, Mode=OneWay}">
-                                    <TextBox
-                                        AutomationProperties.Name="Microsoft tenant"
-                                        FontSize="10.5"
-                                        PlaceholderText="Tenant (common)"
-                                        Style="{StaticResource CardTextBoxStyle}"
-                                        Text="{x:Bind ViewModel.CalendarTenant, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                </Border>
-
-                                <Button
-                                    HorizontalAlignment="Left"
-                                    AutomationProperties.Name="Connect the calendar"
-                                    Click="OnConnectCalendarClick"
-                                    Content="Connect"
-                                    Style="{StaticResource SettingsPrimaryButtonStyle}" />
-
-                                <TextBlock Style="{StaticResource SettingHintTextStyle}" Text="{x:Bind ViewModel.CalendarStatus, Mode=OneWay}" />
-                                <TextBlock
-                                    Style="{StaticResource SettingHintTextStyle}"
-                                    Text="Use a Desktop app OAuth client. Nectar opens your browser and returns to a local port; one calendar at a time."
-                                    TextWrapping="Wrap" />
-                            </StackPanel>
-
-                            <Border
-                                Height="1"
-                                Margin="0,2"
-                                Background="{StaticResource NectarInkFaintBrush}"
-                                Opacity="0.25" />
-
                             <TextBlock
                                 Style="{StaticResource SettingHintTextStyle}"
-                                Text="Events with a reminder ring like the focus tray: Snooze 5 min or Okay."
-                                TextWrapping="Wrap" />
-
-                            <Border
-                                Height="1"
-                                Margin="0,2"
-                                Background="{StaticResource NectarInkFaintBrush}"
-                                Opacity="0.25" />
-
-                            <TextBlock Style="{StaticResource SettingsSectionHeaderTextStyle}" Text="PRIVACY &amp; DATA" />
-
-                            <Grid ColumnSpacing="8">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Spacing="1">
-                                    <TextBlock Style="{StaticResource SettingLabelTextStyle}" Text="Microphone" />
-                                    <TextBlock
-                                        Style="{StaticResource SettingHintTextStyle}"
-                                        Text="{x:Bind ViewModel.MicrophoneStatusLabel, Mode=OneWay}"
-                                        TextWrapping="Wrap" />
-                                </StackPanel>
-                                <Button
-                                    Grid.Column="1"
-                                    VerticalAlignment="Center"
-                                    AutomationProperties.Name="Open microphone privacy settings"
-                                    Click="OnOpenMicrophoneSettingsClick"
-                                    Content="Mic settings"
-                                    Style="{StaticResource GhostActionButtonStyle}" />
-                            </Grid>
-
-                            <Grid ColumnSpacing="8">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Spacing="1">
-                                    <TextBlock Style="{StaticResource SettingLabelTextStyle}" Text="Database" />
-                                    <TextBlock
-                                        Style="{StaticResource SettingHintTextStyle}"
-                                        Text="{x:Bind ViewModel.DatabaseStatusLabel, Mode=OneWay}"
-                                        TextWrapping="Wrap" />
-                                </StackPanel>
-                                <Button
-                                    Grid.Column="1"
-                                    VerticalAlignment="Center"
-                                    AutomationProperties.Name="Show the Nectar data folder"
-                                    Click="OnRevealDataFolderClick"
-                                    Content="Show folder"
-                                    Style="{StaticResource GhostActionButtonStyle}" />
-                            </Grid>
-
-                            <TextBlock
-                                Style="{StaticResource SettingHintTextStyle}"
-                                Text="Notes and tasks are sealed with SQLCipher. db.key is protected by Windows for this account — back up the folder and the key together."
+                                Text="The calendar link, privacy, updates, themes and the reset live in Settings — the gear beside the tabs."
                                 TextWrapping="Wrap" />
                         </StackPanel>
                     </ScrollViewer>
@@ -1622,7 +1473,6 @@
                             <RowDefinition Height="*" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
                         <StackPanel Orientation="Horizontal" Spacing="7">
@@ -1694,21 +1544,18 @@
                             Style="{StaticResource SettingHintTextStyle}"
                             Text="Hidden cards keep their content." />
 
-                        <Button
-                            Grid.Row="4"
-                            Margin="0,4,0,0"
-                            HorizontalAlignment="Left"
-                            Click="OnResetCustomizeClick"
-                            Content="Reset to default"
-                            Style="{StaticResource GhostActionButtonStyle}" />
-
-                        <StackPanel Grid.Row="5" Spacing="4">
+                        <StackPanel Grid.Row="4" Spacing="4">
                             <Border Height="1" Background="{StaticResource NectarInkFaintBrush}" Opacity="0.25" />
                             <TextBlock Style="{StaticResource SettingsHeaderTextStyle}" Text="Look" />
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <Border Padding="8,3" Background="{StaticResource NectarChipBrush}" CornerRadius="8">
-                                    <TextBlock Style="{StaticResource CardMetaTextStyle}" Text="{x:Bind ViewModel.ShortcutUpperLabel, Mode=OneWay}" />
+                                    <TextBlock Style="{StaticResource CardMetaTextStyle}" Text="{x:Bind ViewModel.ThemeName, Mode=OneWay}" />
                                 </Border>
+                                <Button
+                                    AutomationProperties.Name="Open settings to change the look"
+                                    Click="OnSettingsClick"
+                                    Content="Change"
+                                    Style="{StaticResource GhostActionButtonStyle}" />
                             </StackPanel>
                         </StackPanel>
                     </Grid>

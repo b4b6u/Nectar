@@ -50,6 +50,9 @@ public partial class App : Application
         {
             _window = new MainWindow();
 
+            // The saved look is painted before the first frame, so the overlay never flashes Paper.
+            _window.ViewModel.ApplySavedTheme();
+
             // Activate once so the XAML/composition tree is live, then hide immediately:
             // Nectar must not present a primary window on launch.
             _window.Activate();

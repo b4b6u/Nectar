@@ -84,6 +84,7 @@ public sealed partial class MainWindow : Window, IDisposable
     private readonly DispatcherQueueTimer _agendaTimer;
     private readonly DispatcherQueue _dispatcher;
 
+    private SettingsWindow? _settingsWindow;
     private OverlayState _state = OverlayState.Hidden;
     private bool _loadingNote;
     private bool _disposed;
@@ -753,35 +754,31 @@ public sealed partial class MainWindow : Window, IDisposable
         _pointerProbe.SetWindowBounds(default);
     }
 
-    private void OnOpenCalendarLinkClick(object sender, RoutedEventArgs e) => ViewModel.OpenCalendarLinkPanel();
+    /// <summary>The Events card's empty state opens Settings with the link panel already showing.</summary>
+    private void OnLinkCalendarFromAgendaClick(object sender, RoutedEventArgs e) => OpenSettings(openCalendarLink: true);
 
-    private void OnDisconnectCalendarClick(object sender, RoutedEventArgs e) => ViewModel.DisconnectCalendar();
+    /// <summary>The gear beside the tabs. One window at a time; the second click raises it.</summary>
+    private void OnSettingsClick(object sender, RoutedEventArgs e) => OpenSettings();
 
-    private void OnCalendarProviderGoogleClick(object sender, RoutedEventArgs e) =>
-        ViewModel.SelectCalendarProvider(CalendarProviderKind.Google);
-
-    private void OnCalendarProviderMicrosoftClick(object sender, RoutedEventArgs e) =>
-        ViewModel.SelectCalendarProvider(CalendarProviderKind.Microsoft);
-
-    private async void OnConnectCalendarClick(object sender, RoutedEventArgs e)
+    private void OpenSettings(bool openCalendarLink = false)
     {
-        try
+        if (_settingsWindow is not null)
         {
-            await ViewModel.ConnectCalendarAsync();
+            _settingsWindow.Activate();
+            return;
         }
-        catch (Exception ex)
+
+        if (openCalendarLink)
         {
-            AppLogger.Log("Calendar linking failed", ex);
-            ViewModel.ReportProblem($"Calendar linking failed: {ex.Message}");
+            ViewModel.OpenCalendarLinkPanel();
         }
+
+        _settingsWindow = new SettingsWindow(ViewModel, _dictation.DescribeMicrophoneAsync);
+        _settingsWindow.Closed += OnSettingsWindowClosed;
+        _settingsWindow.Activate();
     }
 
-    /// <summary>The Events card's empty state jumps to Customize with the link panel open.</summary>
-    private void OnLinkCalendarFromAgendaClick(object sender, RoutedEventArgs e)
-    {
-        SelectTab(ShellTab.Customize);
-        ViewModel.OpenCalendarLinkPanel();
-    }
+    private void OnSettingsWindowClosed(object sender, WindowEventArgs args) => _settingsWindow = null;
 
     /// <summary>Bell on an event row: pick a lead time, or drop an existing reminder.</summary>
     private void OnEventReminderClick(object sender, RoutedEventArgs e)
@@ -1177,59 +1174,6 @@ public sealed partial class MainWindow : Window, IDisposable
     }
 
     // ======================================================================================
-    // Privacy & data (Customize → General)
-    // ======================================================================================
-
-    private void OnOpenMicrophoneSettingsClick(object sender, RoutedEventArgs e) =>
-        OpenShellTarget("ms-settings:privacy-microphone");
-
-    private void OnRevealDataFolderClick(object sender, RoutedEventArgs e)
-    {
-        var folder = ViewModel.DataFolderPath;
-        if (string.IsNullOrEmpty(folder))
-        {
-            return;
-        }
-
-        try
-        {
-            Directory.CreateDirectory(folder);
-        }
-        catch (Exception ex)
-        {
-            AppLogger.Log("Could not create the data folder", ex);
-        }
-
-        OpenShellTarget("explorer.exe", $"\"{folder}\"");
-    }
-
-    private static void OpenShellTarget(string file, string? arguments = null)
-    {
-        try
-        {
-            var info = new ProcessStartInfo(file) { UseShellExecute = true };
-            if (arguments is not null)
-            {
-                info.Arguments = arguments;
-            }
-
-            Process.Start(info);
-        }
-        catch (Exception ex)
-        {
-            // A missing Settings page or a locked-down shell must not take the overlay down.
-            AppLogger.Log($"Could not open {file}", ex);
-        }
-    }
-
-    private async Task RefreshPrivacyStatusAsync()
-    {
-        var microphone = await _dictation.DescribeMicrophoneAsync();
-        ViewModel.SetMicrophoneStatus(microphone);
-        ViewModel.RefreshPrivacyLabels();
-    }
-
-    // ======================================================================================
     // Shell tabs and card layout
     // ======================================================================================
 
@@ -1251,13 +1195,6 @@ public sealed partial class MainWindow : Window, IDisposable
         WorkspaceView.Visibility = tab == ShellTab.Workspace ? Visibility.Visible : Visibility.Collapsed;
         InsightsView.Visibility = tab == ShellTab.Insights ? Visibility.Visible : Visibility.Collapsed;
         CustomizeView.Visibility = tab == ShellTab.Customize ? Visibility.Visible : Visibility.Collapsed;
-
-        if (tab == ShellTab.Customize)
-        {
-            // Read the microphone and database state when the screen opens, not at startup: the
-            // user may have flipped the Windows privacy switch since Nectar launched.
-            _ = RefreshPrivacyStatusAsync();
-        }
 
         ShellContent.Height = tab switch
         {
@@ -1345,8 +1282,6 @@ public sealed partial class MainWindow : Window, IDisposable
 
     private void OnChimeVolumePlusClick(object sender, RoutedEventArgs e) => ViewModel.NudgeChimeVolume(10);
 
-    private void OnResetCustomizeClick(object sender, RoutedEventArgs e) => ViewModel.ResetCustomization();
-
     private void OnQuitClick(object sender, RoutedEventArgs e)
     {
         try
@@ -1374,6 +1309,13 @@ public sealed partial class MainWindow : Window, IDisposable
         }
 
         _disposed = true;
+
+        if (_settingsWindow is not null)
+        {
+            _settingsWindow.Closed -= OnSettingsWindowClosed;
+            _settingsWindow.Close();
+            _settingsWindow = null;
+        }
 
         _collapseTimer.Stop();
         _agendaTimer.Stop();

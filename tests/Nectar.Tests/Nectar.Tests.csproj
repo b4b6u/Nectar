@@ -26,6 +26,8 @@
     <Compile Include="..\..\Nectar\Services\AtomicFile.cs" Link="Source\AtomicFile.cs" />
     <Compile Include="..\..\Nectar\Services\NetworkGuard.cs" Link="Source\NetworkGuard.cs" />
     <Compile Include="..\..\Nectar\Services\Dictation\DictationFallback.cs" Link="Source\DictationFallback.cs" />
+    <Compile Include="..\..\Nectar\Settings\ThemeIds.cs" Link="Source\ThemeIds.cs" />
+    <Compile Include="..\..\Nectar\Settings\WorkspaceSettings.cs" Link="Source\WorkspaceSettings.cs" />
   </ItemGroup>
 
 </Project>

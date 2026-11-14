@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="Nectar.SettingsWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <!--
+        The settings window. Everything that is plumbing rather than everyday work lives here:
+        linking a calendar, what is on disk and in the microphone, permissions and updates, the
+        look, and the reset. The notch itself keeps Workspace, Insights and Customize.
+    -->
+    <Grid
+        Padding="14,10,14,14"
+        Background="{StaticResource NectarShellBrush}"
+        RowSpacing="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid ColumnSpacing="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <FontIcon
+                    FontSize="14"
+                    Foreground="{StaticResource NectarShellTextMutedBrush}"
+                    Glyph="&#xE713;" />
+                <TextBlock
+                    VerticalAlignment="Center"
+                    FontSize="15"
+                    FontWeight="SemiBold"
+                    Foreground="{StaticResource NectarShellTextBrush}"
+                    Text="Settings" />
+                <Border
+                    Padding="8,3"
+                    VerticalAlignment="Center"
+                    Background="{StaticResource NectarTabTrackBrush}"
+                    CornerRadius="8">
+                    <TextBlock Style="{StaticResource CardMetaTextStyle}" Text="{x:Bind ViewModel.ThemeName, Mode=OneWay}" />
+                </Border>
+            </StackPanel>
+
+            <Button
+                Grid.Column="1"
+                AutomationProperties.Name="Close settings"
+                Click="OnCloseClick"
+                Style="{StaticResource ShellIconButtonStyle}"
+                ToolTipService.ToolTip="Close">
+                <FontIcon FontSize="10" Glyph="&#xE711;" />
+            </Button>
+        </Grid>
+
+        <ScrollViewer
+            Grid.Row="1"
+            HorizontalScrollMode="Disabled"
+            VerticalScrollBarVisibility="Auto"
+            VerticalScrollMode="Enabled">
+            <StackPanel Spacing="10">
+
+                <!-- ===== Calendar ===== -->
+                <Border
+                    Padding="14,12"
+                    Background="{StaticResource NectarMintCardBrush}"
+                    CornerRadius="18">
+                    <StackPanel Spacing="9">
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <FontIcon FontSize="12" Foreground="{StaticResource NectarInkMutedBrush}" Glyph="&#xE787;" />
+                            <TextBlock Style="{StaticResource CardTitleTextStyle}" Text="Linked calendar" />
+                            <Border
+                                Padding="8,3"
+                                Margin="4,0,0,0"
+                                Background="{StaticResource NectarChipBrush}"
+                                CornerRadius="8">
+                                <TextBlock Style="{StaticResource CardMetaTextStyle}" Text="{x:Bind ViewModel.CalendarLinkLabel, Mode=OneWay}" />
+                            </Border>
+                        </StackPanel>
+
+                        <TextBlock
+                            Style="{StaticResource SettingHintTextStyle}"
+                            Text="One calendar at a time. Tokens are encrypted for your Windows account and never leave this PC."
+                            TextWrapping="Wrap" />
+
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <Button
+                                AutomationProperties.Name="Link a calendar"
+                                Click="OnOpenCalendarLinkClick"
+                                Content="Link calendar"
+                                Style="{StaticResource GhostActionButtonStyle}"
+                                Visibility="{x:Bind ViewModel.CalendarLinkVisibility, Mode=OneWay}" />
+                            <Button
+                                AutomationProperties.Name="Disconnect the calendar"
+                                Click="OnDisconnectCalendarClick"
+                                Content="Disconnect"
+                                Style="{StaticResource GhostActionButtonStyle}"
+                                Visibility="{x:Bind ViewModel.CalendarDisconnectVisibility, Mode=OneWay}" />
+                        </StackPanel>
+
+                        <StackPanel Spacing="7" Visibility="{x:Bind ViewModel.CalendarPanelVisibility, Mode=OneWay}">
+                            <Border
+                                Padding="3"
+                                HorizontalAlignment="Left"
+                                Background="#26000000"
+                                CornerRadius="13">
+                                <StackPanel Orientation="Horizontal" Spacing="2">
+                                    <Button
+                                        AutomationProperties.Name="Use Google Calendar"
+                                        Background="{x:Bind ViewModel.GoogleChipBackground, Mode=OneWay}"
+                                        Click="OnCalendarProviderGoogleClick"
+                                        Content="Google"
+                                        Foreground="{x:Bind ViewModel.GoogleChipForeground, Mode=OneWay}"
+                                        Style="{StaticResource TrayChipButtonStyle}" />
+                                    <Button
+                                        AutomationProperties.Name="Use Microsoft Calendar"
+                                        Background="{x:Bind ViewModel.MicrosoftChipBackground, Mode=OneWay}"
+                                        Click="OnCalendarProviderMicrosoftClick"
+                                        Content="Microsoft"
+                                        Foreground="{x:Bind ViewModel.MicrosoftChipForeground, Mode=OneWay}"
+                                        Style="{StaticResource TrayChipButtonStyle}" />
+                                </StackPanel>
+                            </Border>
+
+                            <Border
+                                Padding="9,3"
+                                Background="#59FFFFFF"
+                                CornerRadius="9">
+                                <TextBox
+                                    AutomationProperties.Name="OAuth client ID"
+                                    FontSize="10.5"
+                                    PlaceholderText="OAuth client ID"
+                                    Style="{StaticResource CardTextBoxStyle}"
+                                    Text="{x:Bind ViewModel.CalendarClientId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            </Border>
+
+                            <Border
+                                Padding="9,3"
+                                Background="#59FFFFFF"
+                                CornerRadius="9"
+                                Visibility="{x:Bind ViewModel.CalendarTenantVisibility, Mode=OneWay}">
+                                <TextBox
+                                    AutomationProperties.Name="Microsoft tenant"
+                                    FontSize="10.5"
+                                    PlaceholderText="Tenant (common)"
+                                    Style="{StaticResource CardTextBoxStyle}"
+                                    Text="{x:Bind ViewModel.CalendarTenant, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            </Border>
+
+                            <Button
+                                HorizontalAlignment="Left"
+                                AutomationProperties.Name="Connect the calendar"
+                                Click="OnConnectCalendarClick"
+                                Content="Connect"
+                                Style="{StaticResource SettingsPrimaryButtonStyle}" />
+
+                            <TextBlock Style="{StaticResource SettingHintTextStyle}" Text="{x:Bind ViewModel.CalendarStatus, Mode=OneWay}" />
+                            <TextBlock
+                                Style="{StaticResource SettingHintTextStyle}"
+                                Text="Use a Desktop app OAuth client. Nectar opens your browser and returns to a local port."
+                                TextWrapping="Wrap" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- ===== Privacy & data ===== -->
+                <Border
+                    Padding="14,12"
+                    Background="{StaticResource NectarLilacCardBrush}"
+                    CornerRadius="18">
+                    <StackPanel Spacing="9">
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <FontIcon FontSize="12" Foreground="{StaticResource NectarInkMutedBrush}" Glyph="&#xE72E;" />
+                            <TextBlock Style="{StaticResource CardTitleTextStyle}" Text="Privacy &amp; data" />
+                        </StackPanel>
+
+                        <Grid ColumnSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Spacing="1">
+                                <TextBlock Style="{StaticResource SettingLabelTextStyle}" Text="Microphone" />
+                                <TextBlock
+                                    Style="{StaticResource SettingHintTextStyle}"
+                                    Text="{x:Bind ViewModel.MicrophoneStatusLabel, Mode=OneWay}"
+                                    TextWrapping="Wrap" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
+                                <Button
+                                    AutomationProperties.Name="Check the microphone again"
+                                    Click="OnCheckMicrophoneClick"
+                                    Content="Check"
+                                    Style="{StaticResource GhostActionButtonStyle}" />
+                                <Button
+                                    AutomationProperties.Name="Open microphone privacy settings"
+                                    Click="OnOpenMicrophoneSettingsClick"
+                                    Content="Mic settings"
+                                    Style="{StaticResource GhostActionButtonStyle}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid ColumnSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Spacing="1">
+                                <TextBlock Style="{StaticResource SettingLabelTextStyle}" Text="Database" />
+                                <TextBlock
+                                    Style="{StaticResource SettingHintTextStyle}"
+                                    Text="{x:Bind ViewModel.DatabaseStatusLabel, Mode=OneWay}"
+                                    TextWrapping="Wrap" />
+                            </StackPanel>
+                            <Button
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                AutomationProperties.Name="Show the Nectar data folder"
+                                Click="OnRevealDataFolderClick"
+                                Content="Show folder"
+                                Style="{StaticResource GhostActionButtonStyle}" />
+                        </Grid>
+
+                        <TextBlock
+                            Style="{StaticResource SettingHintTextStyle}"
+                            Text="Notes and tasks are sealed with SQLCipher. db.key is protected by Windows for this account — back up the folder and the key together."
+                            TextWrapping="Wrap" />
+                    </StackPanel>
+                </Border>
+
+                <!-- ===== Permissions & updates ===== -->
+                <Border
+                    Padding="14,12"
+                    Background="{StaticResource NectarSkyCardBrush}"
+                    CornerRadius="18">
+                    <StackPanel Spacing="8">
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <FontIcon FontSize="12" Foreground="{StaticResource NectarInkMutedBrush}" Glyph="&#xE7BA;" />
+                            <TextBlock Style="{StaticResource CardTitleTextStyle}" Text="Permissions &amp; updates" />
+                        </StackPanel>
+
+                        <Grid>
+                            <TextBlock Style="{StaticResource SettingLabelTextStyle}" Text="Calendar access" />
+                            <TextBlock
+                                HorizontalAlignment="Right"
+                                Style="{StaticResource CardMetaTextStyle}"
+                                Text="{x:Bind ViewModel.CalendarState, Mode=OneWay}" />
+                        </Grid>
+
+                        <Grid>
+                            <TextBlock Style="{StaticResource SettingLabelTextStyle}" Text="Notifications" />
+                            <TextBlock HorizontalAlignment="Right" Style="{StaticResource CardMetaTextStyle}" Text="On" />
+                        </Grid>
+
+                        <Grid>
+                            <TextBlock Style="{StaticResource SettingLabelTextStyle}" Text="Version" />
+                            <TextBlock HorizontalAlignment="Right" Style="{StaticResource CardMetaTextStyle}" Text="{x:Bind VersionLabel}" />
+                        </Grid>
+
+                        <TextBlock
+                            Style="{StaticResource SettingHintTextStyle}"
+                            Text="Updates are a newer setup run over the top; your tasks, note and settings stay. Nothing updates itself in the background."
+                            TextWrapping="Wrap" />
+
+                        <Button
+                            HorizontalAlignment="Left"
+                            AutomationProperties.Name="Open the releases page"
+                            Click="OnOpenReleasesClick"
+                            Content="Latest release"
+                            Style="{StaticResource GhostActionButtonStyle}" />
+                    </StackPanel>
+                </Border>
+
+                <!-- ===== Look ===== -->
+                <Border
+                    Padding="14,12"
+                    Background="{StaticResource NectarButterCardBrush}"
+                    CornerRadius="18">
+                    <StackPanel Spacing="8">
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <FontIcon FontSize="12" Foreground="{StaticResource NectarInkMutedBrush}" Glyph="&#xE790;" />
+                            <TextBlock Style="{StaticResource CardTitleTextStyle}" Text="Look" />
+                        </StackPanel>
+
+                        <TextBlock
+                            Style="{StaticResource SettingHintTextStyle}"
+                            Text="The shell, the four card colours and the ink. The change is immediate and remembered."
+                            TextWrapping="Wrap" />
+
+                        <StackPanel x:Name="ThemeChoices" Spacing="6" />
+                    </StackPanel>
+                </Border>
+
+                <!-- ===== About ===== -->
+                <Border
+                    Padding="14,12"
+                    Background="{StaticResource NectarMintCardBrush}"
+                    CornerRadius="18">
+                    <StackPanel Spacing="8">
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <FontIcon FontSize="12" Foreground="{StaticResource NectarInkMutedBrush}" Glyph="&#xE946;" />
+                            <TextBlock Style="{StaticResource CardTitleTextStyle}" Text="About Nectar" />
+                        </StackPanel>
+
+                        <TextBlock
+                            Style="{StaticResource SettingHintTextStyle}"
+                            Text="A top-anchored workspace for Windows. Free, no account, no telemetry."
+                            TextWrapping="Wrap" />
+
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <Button
+                                AutomationProperties.Name="Visit the Nectar website"
+                                Click="OnOpenWebsiteClick"
+                                Content="nectarnotch.vercel.app"
+                                Style="{StaticResource GhostActionButtonStyle}" />
+                            <Button
+                                AutomationProperties.Name="Open the Nectar data folder"
+                                Click="OnRevealDataFolderClick"
+                                Content="Data folder"
+                                Style="{StaticResource GhostActionButtonStyle}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- ===== Reset ===== -->
+                <Border
+                    Padding="14,12"
+                    Background="{StaticResource NectarSkyCardBrush}"
+                    CornerRadius="18">
+                    <Grid ColumnSpacing="10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Spacing="2">
+                            <TextBlock Style="{StaticResource SettingLabelTextStyle}" Text="Reset to default" />
+                            <TextBlock
+                                Style="{StaticResource SettingHintTextStyle}"
+                                Text="Cards, focus, sounds, the pill and the look go back to how they ship. Your shortcut, your calendar link and your data stay."
+                                TextWrapping="Wrap" />
+                        </StackPanel>
+                        <Button
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            AutomationProperties.Name="Reset settings to default"
+                            Click="OnResetClick"
+                            Content="Reset"
+                            Style="{StaticResource GhostActionButtonStyle}" />
+                    </Grid>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Window>

@@ -3,9 +3,9 @@
 A native Windows productivity overlay that lives at the top edge of the screen. It ships as a
 background agent with no primary window: hover the top-centre notch or press **Alt + N** and a
 dark shell slides down holding four pastel cards — **Tasks**, **Focus timer**, **Notepad** and
-**Events** — plus **Insights** and **Customize** views in the header. The open chord is rebindable,
-and the Events card can show one linked calendar — Google or Microsoft — whose events can carry a
-reminder tray of their own.
+**Events** — plus **Insights** and **Customize** views in the header and a **gear** beside them for
+settings. The open chord is rebindable, the look is one of four themes, and the Events card can show
+one linked calendar — Google or Microsoft — whose events can carry a reminder tray of their own.
 
 The mascot is the round navy bird from the logo — cream face, pink cheek, swept wing — on an
 orange tile.
@@ -172,17 +172,37 @@ toggle, the window's date range, hairline grid lines, light "planned" caps behin
 and the legend along the bottom. Both series come from SQLite — `Tasks.CompletedAt` and
 `FocusSessions` — and are recomputed every time the tab opens.
 
-**Customize** — three pastel cards. **General** (mint) holds how the notch opens: a **Hover** switch
+**Customize** — three pastel cards, all of them about the notch itself. **General** (mint) holds how the notch opens: a **Hover** switch
 for the top-centre band, a **Notch pill** switch (off hides the collapsed pill entirely, so Nectar
 is reachable only by the shortcut or the top edge), and the editable **Open shortcut** (click it,
-press the chord you want, Esc cancels), followed by the **Calendar** block. **Focus** (lilac) holds the default timer, session
+press the chord you want, Esc cancels). **Focus** (lilac) holds the default timer, session
 duration, two independent sound switches — **Completion sound** (the bird call at 00:00) and
 **Reminder sound** (a due calendar event) — chime volume (0–100% in 10% steps; 0% is silent for
-both), the **Expiry tray** switch that decides whether 00:00 may drop the notification tray, and the
-permissions/version footer. **Customize workspace** (sky) holds per-card visibility toggles,
-drag-to-reorder and **Reset to default**, plus the Look tag line. All of it persists to
-`settings.json`; reset restores the card layout and focus defaults but keeps the shortcut, hover
-setting and calendar link. The header tabs sit top-right, matching the reference design.
+both) and the **Expiry tray** switch that decides whether 00:00 may drop the notification tray.
+**Customize workspace** (sky) holds per-card visibility toggles and drag-to-reorder, plus the
+**Look** line that names the current theme and links straight into Settings. The header tabs sit
+top-right with the gear beside them, matching the reference design.
+
+**Settings** — a separate window opened by the **gear** to the right of the three tabs (or by the
+Events card's empty state, which lands on the calendar section). Everything that is plumbing rather
+than everyday work lives here, in five cards:
+
+- **Linked calendar** — the provider chips, the OAuth client ID (and Microsoft tenant), **Connect**,
+  **Disconnect**, and the status line. Linking here updates the Events card without a restart.
+- **Privacy & data** — the microphone state with a **Check** button and a jump to Windows' mic
+  privacy page; the database state and a **Show folder** button; the reminder that notes and tasks
+  are sealed with SQLCipher and that `db.key` travels with the folder.
+- **Permissions & updates** — calendar access, notifications, the version, and a **Latest release**
+  link. Updates are a newer setup run over the top; nothing updates itself in the background.
+- **Look** — four themes, each with its four card colours shown as swatches: **Paper** (the
+  shipping pastel-on-black look), **Meadow** (greener), **Sunset** (warm), **Midnight** (dark cards,
+  light ink, for a dim room). Choosing one repaints both windows immediately and is remembered.
+- **About** — the website link (`nectarnotch.vercel.app`), the data folder, and **Reset to default**
+  (cards, focus, sounds, pill and theme return to how they ship; the shortcut, the calendar link
+  and your data are kept).
+
+All of it persists to `settings.json`. The theme is applied before the first frame, so the overlay
+never flashes the wrong colours on launch.
 
 **Focus expiry** — when the countdown reaches 00:00 the bird chime plays, unless **Completion
 sound** is off, and the compact
@@ -263,7 +283,8 @@ Nectar/
 │  ├─ WorkspaceRepository.cs      Short-lived contexts per operation, error wrapping
 │  └─ Entities/                   WorkspaceTask, EphemeralNote, FocusSession
 ├─ Settings/
-│  └─ WorkspaceSettings.cs        Card order/visibility + focus defaults (settings.json)
+│  ├─ WorkspaceSettings.cs        Card order/visibility, focus defaults, theme (settings.json)
+│  └─ ThemeIds.cs                 The four theme ids, WinUI-free so the tests can cover them
 ├─ Services/
 │  ├─ FocusTimerService.cs        Deadline-based countdown, PowerModeChanged pause, extend, no audio
 │  ├─ CompletionChime.cs          The one completion signal: bird call at 00:00 (state-free)
@@ -273,8 +294,10 @@ Nectar/
 │  │  ├─ OAuthLoopbackListener.cs Raw TcpListener on 127.0.0.1, no URL ACL needed
 │  │  ├─ CalendarTokenStore.cs    DPAPI-encrypted token record (calendar-auth.bin)
 │  │  └─ LinkedCalendarService.cs Google calendarView / Microsoft Graph, today only
+│  ├─ AppTheme.cs                 The four palettes; repaints the brushes in place
 │  └─ AppLogger.cs                %LOCALAPPDATA%\Nectar\nectar.log
 ├─ ViewModels/                    ObservableCollection state, TaskRow, CalendarEventRow, insights
+├─ SettingsWindow.xaml            The settings window: calendar, privacy, updates, look, reset
 └─ Styles/Theme.xaml              Shell, card palettes, typography, control styles
 ```
 
@@ -386,6 +409,19 @@ fill, a rounded corner and a fine grain overlay (`Assets/card-grain.png`) for a 
   planned caps.
 - Customize: three cards — mint General, lilac Focus, sky workspace — with near-black toggle
   switches and sky-blue input fields.
+- Settings: the same four card colours on the black shell, one card per section, with the theme
+  swatches drawn in the Look card.
+
+### Themes
+
+The palette above is the **Paper** theme, and it is the default. Three more are offered in
+Settings › Look: **Meadow** (greener cards, mossy brand), **Sunset** (warm cards, browned ink) and
+**Midnight** (dark cards with light ink for a dim room). A theme is a table of colours in
+`Services/AppTheme.cs`; applying one mutates the `SolidColorBrush` instances that
+`Styles/Theme.xaml` already handed to every control, so both windows repaint without being rebuilt
+and without a restart. The id is stored in `settings.json` as `Theme` and is normalized against
+`Settings/ThemeIds.cs` on load, so a hand-edited or unknown value falls back to Paper instead of
+leaving the app half-themed.
 
 Expansion animates `WorkspaceSurface.Height` 0 → 340 and its opacity with WinUI storyboards
 (`DoubleAnimation`, `EnableDependentAnimation` for height); collapse runs the reverse and only
@@ -400,8 +436,11 @@ then shrinks the window back to a 200 x 30 pill.
   move the pointer to the physical top edge.
 - **No pill after collapsing**: the **Notch pill** switch in Customize → General may be off; with it
   off the overlay is fully hidden between uses and only the shortcut or the hover band opens it.
-- **No events**: link a calendar from Customize → General (or the Events card's empty state) with a
-  Desktop-app OAuth client ID; only one provider can be linked at a time.
+- **No events**: link a calendar from the gear → **Linked calendar** (or the Events card's empty
+  state, which opens the same section) with a Desktop-app OAuth client ID; only one provider
+  can be linked at a time.
+- **The colours are wrong / want the old look**: Settings › Look › **Paper**, or **Reset to
+  default**. A theme id that is not one of the four falls back to Paper on the next launch.
 - **Microphone does nothing**: the button hands off to Windows Voice Typing, so the feature must
   be enabled once in Windows itself. Focus a text field and press `Win`+`H`: the first run shows a
   Microsoft Speech Services notice — accept it, then pick a language and check the microphone under

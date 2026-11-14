@@ -69,6 +69,12 @@ public sealed class WorkspaceSettings
     /// <summary>Microsoft tenant: "common", a tenant id or a domain.</summary>
     public string CalendarTenant { get; set; } = "common";
 
+    /// <summary>
+    /// Which look the app wears: Paper, Meadow, Sunset or Midnight. One of the ids in
+    /// <see cref="ThemeIds.All"/>; anything else falls back to Paper on load.
+    /// </summary>
+    public string Theme { get; set; } = ThemeIds.Default;
+
     public static List<CardPreference> CreateDefaultCards() =>
         new()
         {
@@ -92,11 +98,14 @@ public sealed class WorkspaceSettings
         ExpiryTray = true;
         ExtendMinutes = 5;
         ShowPill = true;
+        Theme = ThemeIds.Default;
     }
 
     /// <summary>Repairs anything a hand-edited or older settings file might be missing.</summary>
     public void Normalize()
     {
+        Theme = ThemeIds.Normalize(Theme);
+
         var known = new[] { TasksCard, TimerCard, NotesCard, EventsCard };
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var repaired = new List<CardPreference>();

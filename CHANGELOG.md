@@ -3,6 +3,44 @@
 What changed in each released build of Nectar. Dates are the day the release was published.
 Downloads live at <https://github.com/b4b6u/Nectar/releases>.
 
+## [1.0.2] — 2026-11-14
+
+### Added
+
+- **A settings window, behind a gear beside the tabs.** The three tabs are now only about the notch;
+  everything that is plumbing moved into its own window: the calendar link (provider, OAuth client
+  ID, tenant, connect, disconnect, status), privacy & data (microphone state with a re-check and a
+  jump to Windows' mic privacy page, the database state, the data folder), permissions & updates
+  (calendar access, notifications, the running version, the latest release), a link to
+  `nectarnotch.vercel.app`, the data folder, and the reset. One window at a time — a second click
+  raises the one already open — and it closes with the overlay.
+- **Four themes** in Settings › Look: **Paper** (the shipping pastel-on-black look), **Meadow**
+  (greener cards, mossy brand), **Sunset** (warm cards, browned ink) and **Midnight** (dark cards
+  with light ink). Each is shown with its four card colours as swatches. Picking one repaints the
+  notch and the settings window immediately, with no restart, and the choice is remembered.
+- The theme is applied from `settings.json` before the first frame, so the overlay never flashes
+  one look and then swaps to another on launch.
+
+### Changed
+
+- **Customize is down to what it does best:** General (hover band, pill switch, shortcut), Focus
+  (session length, sounds, chime volume, expiry tray) and Customize workspace (card order,
+  visibility). The calendar block, the privacy block and the reset button left the card.
+- The Customize card's **Look** line now names the current theme and links into Settings.
+- The Events card's empty state opens Settings on the calendar section instead of switching to
+  Customize with a panel open underneath.
+- `settings.json` gains `Theme`. An unknown, empty or hand-edited value is normalized to `paper` on
+  load, so the app can never start half-themed; **Reset to default** restores the shipping look
+  along with the cards and sounds, while the shortcut, the calendar link and your data stay.
+- The README, the site's Customize section and its feature list describe the new split, and the
+  site's copy no longer sends people to Customize for the calendar.
+
+### Notes
+
+- `Settings/ThemeIds.cs` holds the four ids without any WinUI types, so `dotnet test` covers the
+  normalization rules; `Services/AppTheme.cs` owns the colours and repaints the existing brushes in
+  place rather than rebuilding the windows.
+
 ## [1.0.1] — 2026-11-13
 
 ### Fixed
