@@ -64,13 +64,30 @@ export class RateLimiter {
   }
 }
 
-/** Trusted first hop of the forwarded chain, then the platform header, then a shared bucket. */
+/**
+ * The address a limiter may key on.
+ *
+ * `x-vercel-forwarded-for` is written by Vercel's own edge, so a client cannot choose it.
+ * `x-forwarded-for` is only trusted from the **rightmost** entry: Vercel sanitises the chain today,
+ * but a proxy placed in front of the deployment would let a caller prepend whatever it likes (the
+ * classic `split(",")[0]` limiter bypass). Reading from the right costs nothing on Vercel — the
+ * chain has one entry there — and cannot be rotated by a spoofed header.
+ */
 export function clientKey(request: Request): string {
+  const vercel = request.headers.get("x-vercel-forwarded-for")?.split(",")[0]?.trim();
+  if (vercel) {
+    return vercel;
+  }
+
   const forwarded = request.headers.get("x-forwarded-for");
   if (forwarded) {
-    const first = forwarded.split(",")[0]?.trim();
-    if (first) {
-      return first;
+    const hops = forwarded
+      .split(",")
+      .map((hop) => hop.trim())
+      .filter(Boolean);
+    const nearest = hops[hops.length - 1];
+    if (nearest) {
+      return nearest;
     }
   }
 
@@ -87,6 +104,16 @@ export function fingerprint(value: string): string {
   }
 
   return hash.toString(16).padStart(8, "0");
+}
+
+/** Escapes a value for interpolation into the plain-HTML status pages the feed route serves. */
+export function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 export function newRequestId(): string {

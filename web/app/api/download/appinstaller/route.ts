@@ -4,7 +4,7 @@ import {
   isSecureFeedUrl,
   parseMainPackage
 } from "../../../../lib/appinstaller";
-import { RateLimiter, clientKey, fingerprint, newRequestId } from "../../../../lib/feedGuard";
+import { RateLimiter, clientKey, escapeHtml, fingerprint, newRequestId } from "../../../../lib/feedGuard";
 
 /**
  * The live .appinstaller feed.
@@ -193,7 +193,7 @@ function htmlPage(
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>${title} — Nectar</title>
+<title>${escapeHtml(title)} — Nectar</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -231,7 +231,7 @@ function htmlPage(
   <h1>${title}</h1>
   <p class="copy">${message}</p>
   <a href="/">Back to Nectar</a>
-  <p class="ref">Request ${requestId}</p>
+  <p class="ref">Request ${escapeHtml(requestId)}</p>
 </main>
 </body>
 </html>`;
@@ -372,7 +372,7 @@ export async function GET(request: Request): Promise<Response> {
     return htmlPage(
       503,
       "That release has no installer yet.",
-      `Release <code>${release.tag_name}</code> is published but has no signed <code>.msix</code> attached. Nothing is installable until it does.`,
+      `Release <code>${escapeHtml(release.tag_name)}</code> is published but has no signed <code>.msix</code> attached. Nothing is installable until it does.`,
       { "Retry-After": "900", "X-Nectar-Feed-Url": feedUrl },
       requestId
     );
@@ -394,7 +394,7 @@ export async function GET(request: Request): Promise<Response> {
       "The feed identity is incomplete.",
       !publisher
         ? "No publisher could be determined. Attach the rendered <code>.appinstaller</code> to the release, or set <code>MSIX_PUBLISHER</code> to the certificate subject."
-        : `The tag <code>${release.tag_name}</code> is not a MAJOR.MINOR.PATCH version, so the four-part identity cannot be derived.`,
+        : `The tag <code>${escapeHtml(release.tag_name)}</code> is not a MAJOR.MINOR.PATCH version, so the four-part identity cannot be derived.`,
       { "X-Nectar-Feed-Url": feedUrl },
       requestId
     );

@@ -1,4 +1,5 @@
 import { isSecureFeedUrl } from "../../../lib/appinstaller";
+import { RateLimiter, clientKey } from "../../../lib/feedGuard";
 
 /**
  * The Windows download button.
@@ -8,8 +9,12 @@ import { isSecureFeedUrl } from "../../../lib/appinstaller";
  * The MSIX feed (`/downloads/nectar.appinstaller`) stays for people already installed that way, but
  * the plain setup exe is the one that installs without importing a certificate first.
  *
- * Configuration mirrors the feed route: NECTAR_GITHUB_REPO (or GITHUB_REPOSITORY), and an optional
- * GITHUB_TOKEN for a private repository.
+ * This route is unauthenticated and costs one GitHub API call when it misses: the resolved asset is
+ * cached in-process for a few seconds and each client is limited per minute, so a loop against the
+ * button cannot drain the API quota the installer feed also depends on.
+ *
+ * Configuration mirrors the feed route: NECTAR_GITHUB_REPO (or GITHUB_REPOSITORY), an optional
+ * GITHUB_TOKEN for a private repository, and DOWNLOAD_RATE_LIMIT (default 30/minute per client).
  */
 
 export const dynamic = "force-dynamic";
@@ -17,18 +22,39 @@ export const revalidate = 0;
 
 const GITHUB_API = "https://api.github.com";
 
+const RATE_LIMIT = Math.max(1, Number(process.env.DOWNLOAD_RATE_LIMIT ?? 30));
+const RESOLVED_TTL_MS = 30_000;
+
+const limiter = new RateLimiter(RATE_LIMIT, 60_000);
+
+let cached: { location: string; asset: string; expiresAt: number } | null = null;
+
 function repoSlug(): string | null {
   const raw = process.env.NECTAR_GITHUB_REPO ?? process.env.GITHUB_REPOSITORY ?? "";
   const trimmed = raw.trim();
   return /^[\w.-]+\/[\w.-]+$/.test(trimmed) ? trimmed : null;
 }
 
-function textPage(status: number, title: string, message: string): Response {
+function textPage(status: number, title: string, message: string, extraHeaders: Record<string, string> = {}): Response {
   return new Response(`${title}\n\n${message}\n`, {
     status,
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
-      "Cache-Control": "no-store"
+      "Cache-Control": "no-store",
+      ...extraHeaders
+    }
+  });
+}
+
+function redirect(location: string, asset: string, cacheState: "HIT" | "MISS"): Response {
+  return new Response(null, {
+    status: 302,
+    headers: {
+      Location: location,
+      "Cache-Control": "no-store",
+      "X-Nectar-Asset": asset,
+      "X-Nectar-Cache": cacheState,
+      "X-RateLimit-Limit": String(RATE_LIMIT)
     }
   });
 }
@@ -38,7 +64,20 @@ interface ReleaseAsset {
   browser_download_url: string;
 }
 
-export async function GET(): Promise<Response> {
+export async function GET(request: Request): Promise<Response> {
+  const limit = limiter.take(clientKey(request));
+  if (!limit.allowed) {
+    return textPage(429, "Too many download requests.", "Wait a moment and press download again.", {
+      "Retry-After": String(limit.retryAfterSeconds),
+      "X-RateLimit-Limit": String(RATE_LIMIT),
+      "X-RateLimit-Remaining": "0"
+    });
+  }
+
+  if (cached && cached.expiresAt > Date.now()) {
+    return redirect(cached.location, cached.asset, "HIT");
+  }
+
   const repo = repoSlug();
   if (!repo) {
     return textPage(
@@ -92,12 +131,6 @@ export async function GET(): Promise<Response> {
     );
   }
 
-  return new Response(null, {
-    status: 302,
-    headers: {
-      Location: asset.browser_download_url,
-      "Cache-Control": "no-store",
-      "X-Nectar-Asset": asset.name
-    }
-  });
+  cached = { location: asset.browser_download_url, asset: asset.name, expiresAt: Date.now() + RESOLVED_TTL_MS };
+  return redirect(asset.browser_download_url, asset.name, "MISS");
 }
