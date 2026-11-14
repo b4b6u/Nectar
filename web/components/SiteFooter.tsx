@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 /** The footer every page shares: ink band, the wordmark, the product line and the three links. */
@@ -6,10 +7,19 @@ export default function SiteFooter() {
     <footer className="relative z-10 border-t-2 border-ink bg-ink text-paper">
       {/* Extra bottom room: the forest-sound control floats in the bottom-right corner. */}
       <div className="mx-auto flex max-w-shell flex-col gap-6 px-5 pb-20 pt-10 sm:px-6 md:flex-row md:items-center md:justify-between">
-        <div className="flex items-baseline gap-1.5">
+        <Link className="group flex items-center gap-2" href="/">
+          <Image
+            alt="Nectar"
+            className="h-[30px] w-[30px] rounded-[9px] border-2 border-paper/40 transition-transform group-hover:-rotate-6"
+            height={30}
+            src="/Nectar/Assets/nectar-mark.scale-400.png"
+            width={30}
+          />
           <span className="font-display text-[30px] uppercase leading-none">nectar</span>
-          <span className="text-[15px] text-orange">&hearts;</span>
-        </div>
+          <span className="text-[15px] text-orange transition-transform group-hover:scale-110">
+            &hearts;
+          </span>
+        </Link>
 
         <p className="m-0 max-w-sm text-[13px] leading-relaxed text-paper/70">
           Built, signed and run locally &middot; C# &middot; .NET 8 &middot; WinUI 3. A top-edge

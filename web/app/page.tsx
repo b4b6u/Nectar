@@ -50,17 +50,6 @@ const STRUCTURED_DATA = {
   ]
 };
 
-/** The ticker under the hero: the promises, set as a strip of stamps. */
-const TICKER = [
-  "Alt + N opens the notch",
-  "No account",
-  "No telemetry",
-  "No server",
-  "No Electron",
-  "No web view",
-  "C# · .NET 8 · WinUI 3"
-] as const;
-
 /** The four beats of the story the hummingbird carries across the page. */
 const STORY = [
   {
@@ -226,9 +215,7 @@ export default function Home() {
         {/* Hero */}
         <section className="relative overflow-hidden px-5 pb-10 pt-12 sm:px-6 sm:pt-16">
           <div className="mx-auto max-w-shell text-center">
-            <Kicker className="text-ink/70">Windows 10 &amp; 11 &middot; WinUI 3 &middot; Free</Kicker>
-
-            <h1 className="mx-auto mt-6 max-w-5xl font-display text-hero uppercase">
+            <h1 className="mx-auto max-w-5xl font-display text-hero uppercase">
               <span className="display-shadow -rotate-1 inline-block text-orange">Your day,</span>{" "}
               <span className="display-shadow inline-block">perfectly</span>{" "}
               <span className="display-shadow rotate-1 inline-block">anchored.</span>
@@ -272,26 +259,6 @@ export default function Home() {
           </figure>
         </section>
 
-        {/* Ticker */}
-        <div className="overflow-hidden border-y-2 border-ink bg-leaf py-2.5 text-inkSolid">
-          <div className="marquee">
-            {[0, 1].map((copy) => (
-              <div
-                key={copy}
-                aria-hidden={copy === 1}
-                className="flex shrink-0 items-center whitespace-nowrap text-[12px] font-bold uppercase tracking-[0.2em]"
-              >
-                {TICKER.map((item) => (
-                  <span key={item} className="flex items-center">
-                    <span className="px-5">{item}</span>
-                    <span className="text-orange">&hearts;</span>
-                  </span>
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* The story the bird is telling */}
         <section id="story" className="px-5 py-20 sm:px-6">
           <div className="mx-auto max-w-shell">
@@ -331,10 +298,6 @@ export default function Home() {
                 </li>
               ))}
             </ol>
-
-            <p className="mt-12 text-center text-[10.5px] font-bold uppercase tracking-[0.2em] text-muted">
-              The bird flies left to right as you read &middot; the forest button turns the sound on
-            </p>
           </div>
         </section>
 
@@ -342,8 +305,7 @@ export default function Home() {
         <section id="workspace" className="scroll-mt-24 bg-orange px-5 py-20 text-paper sm:px-6">
           <div className="mx-auto max-w-shell">
             <div className="mx-auto max-w-2xl text-center">
-              <Kicker className="text-paper/80">Vol. 01 / The workspace</Kicker>
-              <h2 className="mt-5 font-display text-scene uppercase">
+              <h2 className="font-display text-scene uppercase">
                 <span className="display-shadow inline-block -rotate-1">Four cards.</span>{" "}
                 <span className="display-shadow inline-block">Nothing</span>{" "}
                 <span className="display-shadow inline-block rotate-1">to arrange.</span>
