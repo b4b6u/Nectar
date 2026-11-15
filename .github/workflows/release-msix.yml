@@ -34,6 +34,19 @@ jobs:
       - name: Check out the tagged commit
         uses: actions/checkout@v4
 
+      # PRO-LICENCE.md says the public release channel carries the free build alone. While the Pro
+      # sources still live in this repository, a tagged build would publish a Pro-enabled binary to
+      # everyone - so the pipeline stops here instead of doing it quietly.
+      - name: Refuse to publish a Pro build publicly
+        shell: pwsh
+        run: |
+          if (Test-Path 'Nectar/Services/Licence/LicenceService.cs') {
+            throw "This repository still contains Nectar Pro sources (Nectar/Services/Licence). " +
+                  "A public release must carry the free build only: exclude the Pro modules from the " +
+                  "build, or move them to the private repository, then re-tag. See PRO-LICENCE.md."
+          }
+          Write-Host 'No Pro sources present; this is a free build.'
+
       # The version is read, never stamped: the tag, the project and the package manifest must
       # already agree, because the manifest is the identity Windows installs and upgrades against.
       - name: Read and cross-check the version

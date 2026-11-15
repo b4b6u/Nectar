@@ -4,13 +4,14 @@ import LegalLayout from "../../components/LegalLayout";
 export const metadata: Metadata = {
   title: "Licence",
   description:
-    "Nectar is released under the MIT licence. Read the full text, what it permits, and the licences of the Microsoft, SQLite and type components it ships with.",
+    "Nectar Free is MIT licensed; the Pro tier is proprietary. Read the MIT text, where the open part ends, and the licences of the Microsoft, SQLite and type components it ships with.",
   alternates: { canonical: "/licence" },
   openGraph: { title: "Licence — Nectar", type: "article", url: "/licence" }
 };
 
 const TOC = [
   { id: "mit", label: "The MIT licence" },
+  { id: "pro", label: "Nectar Pro" },
   { id: "means", label: "What it lets you do" },
   { id: "third-party", label: "Third-party components" },
   { id: "brand", label: "The name and the bird" },
@@ -43,14 +44,50 @@ export default function LicencePage() {
   return (
     <LegalLayout
       title="Licence"
-      lede="Nectar is free and open source under the MIT licence: use it, read it, change it, ship it inside something else. Below is the licence in full, what it lets you do in plainer words, and the terms of the pieces Nectar is built from."
+      lede="Nectar Free is open source under the MIT licence: use it, read it, change it, ship it inside something else. Nectar Pro is not — it is proprietary, sold as a licence key. Below is the MIT text in full, what it lets you do, and exactly where the open part ends."
       updated="Last updated 14 November 2026 · Applies to Nectar 1.0.3"
       toc={TOC}
     >
       <section id="mit">
         <h2>The MIT licence</h2>
-        <p>Nectar — the application, this website and the source — is released under MIT:</p>
+        <p>
+          The free application, this website and the source are released under MIT. One carve-out:
+          the Nectar Pro tier, which has its own section below.
+        </p>
         <pre>{MIT_TEXT}</pre>
+      </section>
+
+      <section id="pro">
+        <h2>Nectar Pro</h2>
+        <p>
+          <strong>The Pro tier is proprietary.</strong> Its licence activation code, its feature
+          modules and its extra palettes are copyright &copy; 2026 b4b6u, all rights reserved. MIT
+          does not apply to them, and buying a key buys a licence to run the Pro build — not
+          ownership of it and not the right to redistribute it.
+        </p>
+        <ul>
+          <li>
+            <strong>Free stays free.</strong> Everything MIT covers keeps working exactly as before,
+            with no account and no expiry.
+          </li>
+          <li>
+            <strong>One binary, gated features.</strong> Pro is enabled on your machine by the
+            licence key you activate in Settings; the gate is in the app, not in a separate download
+            you have to chase.
+          </li>
+          <li>
+            <strong>No public Pro downloads.</strong> Pro builds are never attached to the
+            repository&rsquo;s releases — the public release channel carries the free build alone.
+          </li>
+          <li>
+            <strong>When a licence ends</strong> the app keeps running as Nectar Free. Nothing takes
+            away the rights MIT already gave you.
+          </li>
+        </ul>
+        <p>
+          The full terms live in <code>PRO-LICENCE.md</code> in the repository. Forking the free
+          build is fine; publishing the Pro modules is not.
+        </p>
       </section>
 
       <section id="means">

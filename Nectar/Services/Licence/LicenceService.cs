@@ -1,3 +1,6 @@
+// Nectar Pro - proprietary. Not licensed under the repository's MIT licence.
+// Copyright (c) 2026 b4b6u. All rights reserved. See PRO-LICENCE.md.
+
 using System.Text.Json;
 using Nectar.Interop;
 
