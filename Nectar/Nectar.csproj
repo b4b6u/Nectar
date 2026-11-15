@@ -4,9 +4,10 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
 
-    <!-- The Pro tree (Nectar/Pro/**) is proprietary and is not part of the public build. Free is
-         the default: `dotnet build` compiles the MIT app with no Pro source compiled at all. A Pro
-         build passes -p:NectarPro=true from the private repository. See PRO-LICENCE.md. -->
+    <!-- The Pro tree (Nectar/Pro/**) is proprietary and lives in the private repository
+         b4b6u/nectar-pro, which drops it back in and passes -p:NectarPro=true. This public
+         checkout has no Pro source at all, so the default build is the free tier. See
+         PRO-LICENCE.md. -->
     <NectarPro Condition="'$(NectarPro)' == ''">false</NectarPro>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <RootNamespace>Nectar</RootNamespace>
