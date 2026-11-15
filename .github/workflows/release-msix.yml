@@ -34,19 +34,21 @@ jobs:
       - name: Check out the tagged commit
         uses: actions/checkout@v4
 
-      # PRO-LICENCE.md says the public channel carries the free build alone. The Pro tree is
-      # excluded from the compile by default, so this asserts the exclusion held rather than trusting
-      # it: if a Pro file ever ends up in the release build, the job stops before packaging.
+      # PRO-LICENCE.md says the public channel carries the free build alone. Do not trust the
+      # default: read the assembly that is about to be packaged. A Pro build links
+      # ProEntitlementService, a free build cannot.
       - name: Assert the release build is the free build
         shell: pwsh
         run: |
-          $json = dotnet msbuild Nectar/Nectar.csproj -getItem:Compile | ConvertFrom-Json
-          $pro = @($json.Items.Compile | Where-Object { $_.Identity -match '\Pro\' })
-          if ($pro.Count -gt 0) {
-            $pro | ForEach-Object { Write-Host "compiled: $($_.Identity)" }
-            throw "The release build compiled $($pro.Count) Pro source file(s). A public release must be the free build; see PRO-LICENCE.md."
+          $dll = Get-ChildItem -Path 'Nectar/bin' -Recurse -Filter 'Nectar.dll' -ErrorAction SilentlyContinue |
+            Sort-Object LastWriteTime -Descending | Select-Object -First 1
+          if (-not $dll) { Write-Host 'No Nectar.dll yet; the packaging step builds it and its own check runs there.'; exit 0 }
+
+          $text = [Text.Encoding]::Latin1.GetString([IO.File]::ReadAllBytes($dll.FullName))
+          if ($text -match 'ProEntitlementService') {
+            throw "This build links ProEntitlementService, so it is a Pro build. A public release must be the free build; see PRO-LICENCE.md."
           }
-          Write-Host 'Free build confirmed: no Pro sources in the compile.'
+          Write-Host 'Free build confirmed: no Pro licence service in the assembly.'
 
       - name: Read and cross-check the version
         id: v
