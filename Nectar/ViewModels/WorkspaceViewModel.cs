@@ -5,7 +5,7 @@ using Nectar.Data;
 using Nectar.Data.Entities;
 using Nectar.Hooks;
 using Nectar.Services;
-using Nectar.Services.Licence;
+using Nectar.Services.Entitlement;
 using Nectar.Services.Calendar;
 using Nectar.Settings;
 using Microsoft.UI.Dispatching;
@@ -872,7 +872,7 @@ public sealed class WorkspaceViewModel : ObservableObject
         set
         {
             var next = AppTheme.Normalize(value);
-            if (!ThemeIds.IsEntitled(next, LicenceService.Current.IsPro))
+            if (!ThemeIds.IsEntitled(next, Entitlements.Current.IsPro))
             {
                 // A free install cannot select a Pro palette, whatever the radio button sent.
                 return;
@@ -896,7 +896,7 @@ public sealed class WorkspaceViewModel : ObservableObject
     /// <summary>Applies the saved look at startup, before the first window paints.</summary>
     public void ApplySavedTheme()
     {
-        var next = ThemeIds.Resolve(_settings.Theme, LicenceService.Current.IsPro);
+        var next = ThemeIds.Resolve(_settings.Theme, Entitlements.Current.IsPro);
         if (!string.Equals(next, _settings.Theme, StringComparison.Ordinal))
         {
             // Saved while Pro, now expired or downgraded: settle on Paper and record it, so the

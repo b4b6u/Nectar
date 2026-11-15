@@ -43,7 +43,7 @@ if (-not $version) { throw "Could not read <Version> from $project" }
 Write-Output "building Nectar $version (self-contained publish, no certificate needed)"
 
 if (-not $SkipPublish) {
-    & dotnet publish $project -c Release -p:PublishProfile=win-x64
+    & dotnet publish $project -c Release -p:PublishProfile=win-x64 -p:NectarPro=false
     if ($LASTEXITCODE -ne 0) { throw "publish failed with $LASTEXITCODE" }
     if (-not (Test-Path (Join-Path $publish 'Nectar.exe'))) {
         throw "Publish did not produce Nectar.exe under $publish"

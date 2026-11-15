@@ -3,11 +3,17 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+
+    <!-- The Pro tree (Nectar/Pro/**) is proprietary and is not part of the public build. Free is
+         the default: `dotnet build` compiles the MIT app with no Pro source compiled at all. A Pro
+         build passes -p:NectarPro=true from the private repository. See PRO-LICENCE.md. -->
+    <NectarPro Condition="'$(NectarPro)' == ''">false</NectarPro>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <RootNamespace>Nectar</RootNamespace>
     <AssemblyName>Nectar</AssemblyName>
     <Version>1.0.3</Version>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <DefineConstants Condition="'$(NectarPro)' == 'true'">$(DefineConstants);NECTAR_PRO</DefineConstants>
     <ApplicationIcon>Assets\nectar.ico</ApplicationIcon>
 
     <!-- Unpackaged desktop app: no MSIX, no primary window, launched hidden. -->
@@ -32,6 +38,12 @@
     <DefaultLanguage>en-US</DefaultLanguage>
     <PublishReadyToRun>false</PublishReadyToRun>
   </PropertyGroup>
+
+  <!-- Kept out of the free build entirely: the files are still on disk for the Pro build but
+       are not compiled, so the shipped free binary contains none of their logic. -->
+  <ItemGroup Condition="'$(NectarPro)' != 'true'">
+    <Compile Remove="Pro\**\*.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260921001" />

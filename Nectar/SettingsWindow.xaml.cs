@@ -9,7 +9,7 @@ using Nectar.Interop;
 using Nectar.Services;
 using Nectar.Settings;
 using Nectar.Services.Calendar;
-using Nectar.Services.Licence;
+using Nectar.Services.Entitlement;
 using Nectar.ViewModels;
 using Windows.Graphics;
 using Windows.UI;
@@ -30,7 +30,7 @@ public sealed partial class SettingsWindow : Window
 
     private readonly Func<Task<string>> _readMicrophone;
     private readonly Dictionary<string, RadioButton> _themeChoices = new();
-    private readonly LicenceService _licence = LicenceService.Current;
+    private readonly IEntitlementService _licence = Entitlements.Current;
     private TextBlock? _licenceStatus;
     private TextBox? _licenceInput;
     private bool _syncingTheme;

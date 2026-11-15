@@ -5,9 +5,10 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
+
 using Nectar.Services;
 
-namespace Nectar.Services.Licence;
+namespace Nectar.Pro.Licence;
 
 /// <summary>
 /// Talks to Dodo Payments' public license endpoints.

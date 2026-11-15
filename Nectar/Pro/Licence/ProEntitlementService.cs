@@ -3,8 +3,10 @@
 
 using System.Text.Json;
 using Nectar.Interop;
+using Nectar.Services;
+using Nectar.Services.Entitlement;
 
-namespace Nectar.Services.Licence;
+namespace Nectar.Pro.Licence;
 
 /// <summary>
 /// What the app is allowed to do, decided by a Dodo license key rather than by a flag.
@@ -15,7 +17,7 @@ namespace Nectar.Services.Licence;
 /// window. A network failure never revokes — only an explicit "invalid" from Dodo does, because a
 /// captive portal must not cost someone the features they paid for.
 /// </summary>
-internal sealed class LicenceService
+internal sealed class ProEntitlementService : IEntitlementService
 {
     private const int GraceDays = 7;
 
@@ -23,7 +25,7 @@ internal sealed class LicenceService
     private readonly string _statePath;
     private LicenceState _state;
 
-    internal LicenceService(ILicenceClient? client = null, string? statePath = null)
+    internal ProEntitlementService(ILicenceClient? client = null, string? statePath = null)
     {
         // NECTAR_DODO_TEST=1 points activation at test.dodopayments.com, so a key can be
         // exercised before the live product exists. It never mixes: one base URL per process.
@@ -34,28 +36,25 @@ internal sealed class LicenceService
         _state = Load(_statePath);
     }
 
-    /// <summary>One per process: the settings window and the view model must agree.</summary>
-    internal static LicenceService Current { get; } = new();
-
     internal static string DefaultStatePath => Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "Nectar",
         "licence.json");
 
     /// <summary>Raised after a tier change so open windows can repaint the Pro marks.</summary>
-    internal event EventHandler? Changed;
+    public event EventHandler? Changed;
 
-    internal bool IsPro => _state.IsActive(DateTimeOffset.UtcNow);
+    public bool IsPro => _state.IsActive(DateTimeOffset.UtcNow);
 
-    internal string PlanLabel => IsPro ? "Nectar Pro" : "Nectar Free";
+    public string PlanLabel => IsPro ? "Nectar Pro" : "Nectar Free";
 
-    internal string StatusLabel => _state.LicenceKey is null
+    public string StatusLabel => _state.LicenceKey is null
         ? "No key activated — three themes and the local workspace."
         : IsPro
             ? $"Pro until {_state.OfflineUntilUtc!.Value.ToLocalTime():d MMM yyyy} without a check-in."
             : "The last check-in said this key is no longer active.";
 
-    internal string? MaskedKey => _state.LicenceKey is { Length: > 8 } key
+    public string? MaskedKey => _state.LicenceKey is { Length: > 8 } key
         ? $"{key[..4]}…{key[^4..]}"
         : _state.LicenceKey;
 
@@ -63,7 +62,7 @@ internal sealed class LicenceService
     /// Binds a key to this installation. Returns a message for the settings window; Pro is on only
     /// when Dodo accepted the activation.
     /// </summary>
-    internal async Task<string> ActivateAsync(string rawKey, CancellationToken cancellationToken = default)
+    public async Task<string> ActivateAsync(string rawKey, CancellationToken cancellationToken = default)
     {
         var key = NormalizeKey(rawKey);
         if (key is null)
@@ -103,7 +102,7 @@ internal sealed class LicenceService
     }
 
     /// <summary>Launch-time refresh. Silent: a failure leaves the existing grace window alone.</summary>
-    internal async Task RefreshAsync(CancellationToken cancellationToken = default)
+    public async Task RefreshAsync(CancellationToken cancellationToken = default)
     {
         if (_state.LicenceKey is not { } key || _state.InstanceId is not { } instance)
         {
@@ -140,7 +139,7 @@ internal sealed class LicenceService
     /// <summary>Forgets the key locally. Dodo's deactivate endpoint is not called: the device slot
     /// is freed from the customer portal, and calling it here would free a slot on a machine the
     /// user may still be using.</summary>
-    internal void Deactivate()
+    public void Deactivate()
     {
         _state = LicenceState.Empty;
         Save();

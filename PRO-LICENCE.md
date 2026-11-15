@@ -27,6 +27,22 @@ build produced from them. Those are copyright © 2026 b4b6u, all rights reserved
 - Activate a key you bought, and run Nectar Pro on the machines your key covers.
 - Quote short excerpts for review, comment or security reporting.
 
+## How the split is built
+
+The public repository compiles the free tier. `Nectar/Pro/**` is not compiled unless the build is
+told to include it:
+
+```bash
+dotnet build Nectar/Nectar.csproj                      # free: no Pro source compiled
+dotnet build Nectar/Nectar.csproj -p:NectarPro=true    # Pro: needs Nectar/Pro/** present
+```
+
+`NectarPro` defines `NECTAR_PRO`, which is the only thing that switches
+`Nectar/Services/Entitlement/Entitlements.cs` from `FreeEntitlementService` to the Dodo-backed
+service. The free binary contains no activation code, no HTTP client and no key handling; the
+release pipeline asserts this before it packages anything. The Pro sources are developed and built
+in a private repository that pulls this one in and passes `-p:NectarPro=true`.
+
 ## Distribution
 
 Pro builds are distributed **only** to licensees, through the channels the seller controls (a

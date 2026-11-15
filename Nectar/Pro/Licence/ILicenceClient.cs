@@ -1,7 +1,7 @@
 // Nectar Pro - proprietary. Not licensed under the repository's MIT licence.
 // Copyright (c) 2026 b4b6u. All rights reserved. See PRO-LICENCE.md.
 
-namespace Nectar.Services.Licence;
+namespace Nectar.Pro.Licence;
 
 /// <summary>
 /// The two Dodo endpoints a desktop build needs. Both are public on Dodo's side — no API key, no

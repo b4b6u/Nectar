@@ -1,4 +1,4 @@
-using Nectar.Services.Licence;
+using Nectar.Pro.Licence;
 using Nectar.Settings;
 using Xunit;
 
@@ -57,12 +57,12 @@ public sealed class LicenceTests
     [InlineData("", null)]
     [InlineData(null, null)]
     public void KeysAreNormalizedOrRejected(string? raw, string? expected) =>
-        Assert.Equal(expected, LicenceService.NormalizeKey(raw));
+        Assert.Equal(expected, ProEntitlementService.NormalizeKey(raw));
 
     [Fact]
     public async Task ActivatingAKeyTurnsProOn()
     {
-        var service = new LicenceService(new FakeClient(), TempStatePath());
+        var service = new ProEntitlementService(new FakeClient(), TempStatePath());
 
         Assert.False(service.IsPro);
         var message = await service.ActivateAsync("PRO-AAAA-BBBB-CCCC");
@@ -75,7 +75,7 @@ public sealed class LicenceTests
     [Fact]
     public async Task ARefusedKeyLeavesTheAppFree()
     {
-        var service = new LicenceService(new FakeClient { ActivationSucceeds = false }, TempStatePath());
+        var service = new ProEntitlementService(new FakeClient { ActivationSucceeds = false }, TempStatePath());
 
         var message = await service.ActivateAsync("PRO-AAAA-BBBB-CCCC");
 
@@ -87,7 +87,7 @@ public sealed class LicenceTests
     public async Task AnInvalidCheckInTurnsProOff()
     {
         var client = new FakeClient();
-        var service = new LicenceService(client, TempStatePath());
+        var service = new ProEntitlementService(client, TempStatePath());
         await service.ActivateAsync("PRO-AAAA-BBBB-CCCC");
         Assert.True(service.IsPro);
 
@@ -102,7 +102,7 @@ public sealed class LicenceTests
     public async Task AnUnreachableCheckInKeepsTheGraceWindow()
     {
         var client = new FakeClient();
-        var service = new LicenceService(client, TempStatePath());
+        var service = new ProEntitlementService(client, TempStatePath());
         await service.ActivateAsync("PRO-AAAA-BBBB-CCCC");
 
         // A captive portal must not cost someone the features they paid for.
@@ -116,10 +116,10 @@ public sealed class LicenceTests
     public async Task TheKeySurvivesARestart()
     {
         var path = TempStatePath();
-        var first = new LicenceService(new FakeClient(), path);
+        var first = new ProEntitlementService(new FakeClient(), path);
         await first.ActivateAsync("PRO-AAAA-BBBB-CCCC");
 
-        var second = new LicenceService(new FakeClient(), path);
+        var second = new ProEntitlementService(new FakeClient(), path);
 
         Assert.True(second.IsPro);
         Assert.Equal("PRO-…CCCC", second.MaskedKey);
@@ -128,7 +128,7 @@ public sealed class LicenceTests
     [Fact]
     public void ForgettingTheKeyReturnsToFree()
     {
-        var service = new LicenceService(new FakeClient(), TempStatePath());
+        var service = new ProEntitlementService(new FakeClient(), TempStatePath());
 
         service.Deactivate();
 
@@ -139,7 +139,7 @@ public sealed class LicenceTests
     [Fact]
     public void AGraceWindowInThePastIsNotPro()
     {
-        var expired = new LicenceService.LicenceState
+        var expired = new ProEntitlementService.LicenceState
         {
             LicenceKey = "PRO-AAAA-BBBB-CCCC",
             InstanceId = "lki_test",
