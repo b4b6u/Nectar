@@ -292,6 +292,9 @@
                             TextWrapping="Wrap" />
 
                         <StackPanel x:Name="ThemeChoices" Spacing="6" />
+
+                        <!-- Nectar Pro: the key is the account, so activation lives here. -->
+                        <StackPanel x:Name="LicencePanel" Spacing="6" Margin="0,4,0,0" />
                     </StackPanel>
                 </Border>
 

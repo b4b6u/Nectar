@@ -3,6 +3,27 @@
 What changed in each released build of Nectar. Dates are the day the release was published.
 Downloads live at <https://github.com/b4b6u/Nectar/releases>.
 
+## [Unreleased]
+
+### Added
+
+- **Nectar Pro, sold through Dodo Payments.** A licence key is the account: Dodo holds the customer,
+  the subscription and the billing portal, and Nectar holds a key, an activation id and the last
+  time it checked in. Activation and validation use Dodo's public license endpoints, so the app
+  carries no merchant secret and there is nothing in the binary worth extracting.
+- **Three palettes are free** — Paper, Meadow and Sunset. Midnight and any palette added later are
+  Pro, marked and disabled in Settings for a free install. A Pro palette saved before a downgrade
+  resolves to Paper on the next launch instead of repainting oddly.
+- **A seven-day grace window.** Pro stays on without a check-in; only an explicit "invalid" from
+  Dodo turns it off, so a captive portal or a dead Wi-Fi never costs someone what they paid for.
+- **A Nectar Pro panel in Settings › Look**: the plan, the masked key, one field and one button,
+  plus "forget this key on this PC". Nothing else about the app needs an account.
+
+### Notes
+
+- Keys are bought at the site and activated here; billing changes are made in Dodo's customer
+  portal. `licence.json` is sealed with DPAPI like `db.key`.
+
 ## [1.0.3] — 2026-11-14
 
 ### Added

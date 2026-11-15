@@ -7,7 +7,9 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Shapes;
 using Nectar.Interop;
 using Nectar.Services;
+using Nectar.Settings;
 using Nectar.Services.Calendar;
+using Nectar.Services.Licence;
 using Nectar.ViewModels;
 using Windows.Graphics;
 using Windows.UI;
@@ -28,6 +30,9 @@ public sealed partial class SettingsWindow : Window
 
     private readonly Func<Task<string>> _readMicrophone;
     private readonly Dictionary<string, RadioButton> _themeChoices = new();
+    private readonly LicenceService _licence = LicenceService.Current;
+    private TextBlock? _licenceStatus;
+    private TextBox? _licenceInput;
     private bool _syncingTheme;
 
     public SettingsWindow(WorkspaceViewModel viewModel, Func<Task<string>> readMicrophone)
@@ -41,8 +46,11 @@ public sealed partial class SettingsWindow : Window
         SizeToContent();
 
         BuildThemeChoices();
+        BuildLicencePanel();
         ViewModel.PropertyChanged += OnViewModelPropertyChanged;
+        _licence.Changed += OnLicenceChanged;
         Closed += OnClosed;
+        Closed += (_, _) => _licence.Changed -= OnLicenceChanged;
 
         _ = RefreshMicrophoneAsync();
     }
@@ -81,8 +89,11 @@ public sealed partial class SettingsWindow : Window
     {
         _syncingTheme = true;
 
+        var isPro = _licence.IsPro;
+
         foreach (var theme in AppTheme.Options)
         {
+            var entitled = ThemeIds.IsEntitled(theme.Id, isPro);
             var swatches = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 3 };
             foreach (var color in new[] { theme.Mint, theme.Lilac, theme.Butter, theme.Sky })
             {
@@ -96,7 +107,7 @@ public sealed partial class SettingsWindow : Window
 
             var label = new TextBlock
             {
-                Text = theme.Name,
+                Text = entitled ? theme.Name : theme.Name + "  ·  Pro",
                 FontSize = 12,
                 FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
                 Foreground = (Brush)Application.Current.Resources["NectarInkBrush"],
@@ -104,7 +115,7 @@ public sealed partial class SettingsWindow : Window
 
             var hint = new TextBlock
             {
-                Text = theme.Hint,
+                Text = entitled ? theme.Hint : "A Nectar Pro palette.",
                 FontSize = 10,
                 TextWrapping = TextWrapping.Wrap,
                 Foreground = (Brush)Application.Current.Resources["NectarInkMutedBrush"],
@@ -128,6 +139,8 @@ public sealed partial class SettingsWindow : Window
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 Background = new SolidColorBrush(Color.FromArgb(0x59, 0xFF, 0xFF, 0xFF)),
                 CornerRadius = new CornerRadius(10),
+                IsEnabled = entitled,
+                Opacity = entitled ? 1 : 0.6,
             };
 
             choice.Checked += OnThemeChecked;
@@ -136,6 +149,121 @@ public sealed partial class SettingsWindow : Window
         }
 
         _syncingTheme = false;
+    }
+
+    /// <summary>
+    /// Nectar Pro lives beside the palettes it unlocks: the plan, the key, and one button. The key
+    /// is the account - Dodo holds the customer and the billing portal, so there is nothing to sign
+    /// into here and no password for this app to store.
+    /// </summary>
+    private void BuildLicencePanel()
+    {
+        LicencePanel.Children.Clear();
+
+        var heading = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 7 };
+        heading.Children.Add(new FontIcon
+        {
+            FontSize = 12,
+            Glyph = "",
+            Foreground = (Brush)Application.Current.Resources["NectarInkMutedBrush"],
+        });
+        heading.Children.Add(new TextBlock
+        {
+            Text = "Nectar Pro",
+            Style = (Style)Application.Current.Resources["CardTitleTextStyle"],
+        });
+        LicencePanel.Children.Add(heading);
+
+        _licenceStatus = new TextBlock
+        {
+            Text = _licence.PlanLabel + " · " + _licence.StatusLabel,
+            FontSize = 10,
+            TextWrapping = TextWrapping.Wrap,
+            Foreground = (Brush)Application.Current.Resources["NectarInkMutedBrush"],
+        };
+        LicencePanel.Children.Add(_licenceStatus);
+
+        if (_licence.IsPro)
+        {
+            var forget = new Button
+            {
+                Content = "Forget this key on this PC",
+                Style = (Style)Application.Current.Resources["GhostActionButtonStyle"],
+                HorizontalAlignment = HorizontalAlignment.Left,
+            };
+            forget.Click += OnDeactivateLicenceClick;
+            LicencePanel.Children.Add(forget);
+            return;
+        }
+
+        var row = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6 };
+        _licenceInput = new TextBox
+        {
+            PlaceholderText = "Licence key",
+            FontSize = 11.5,
+            Width = 232,
+        };
+        var activate = new Button
+        {
+            Content = "Activate",
+            Style = (Style)Application.Current.Resources["GhostActionButtonStyle"],
+        };
+        activate.Click += OnActivateLicenceClick;
+        row.Children.Add(_licenceInput);
+        row.Children.Add(activate);
+        LicencePanel.Children.Add(row);
+
+        LicencePanel.Children.Add(new TextBlock
+        {
+            Text = "Keys are sold at nectarnotch.vercel.app · $4.43 a year, billing in Dodo's portal.",
+            FontSize = 10,
+            TextWrapping = TextWrapping.Wrap,
+            Foreground = (Brush)Application.Current.Resources["NectarInkMutedBrush"],
+        });
+    }
+
+    private async void OnActivateLicenceClick(object sender, RoutedEventArgs e)
+    {
+        if (_licenceStatus is not null)
+        {
+            _licenceStatus.Text = "Checking with Dodo…";
+        }
+
+        var message = await _licence.ActivateAsync(_licenceInput?.Text ?? string.Empty).ConfigureAwait(true);
+
+        if (_licenceStatus is not null && !_licence.IsPro)
+        {
+            _licenceStatus.Text = message;
+        }
+    }
+
+    private void OnDeactivateLicenceClick(object sender, RoutedEventArgs e) => _licence.Deactivate();
+
+    private void OnLicenceChanged(object? sender, EventArgs e)
+    {
+        if (!DispatcherQueue.HasThreadAccess)
+        {
+            DispatcherQueue.TryEnqueue(RefreshLicenceUi);
+            return;
+        }
+
+        RefreshLicenceUi();
+    }
+
+    /// <summary>Rebuilds the palettes and the plan line after activation, expiry or a downgrade.</summary>
+    private void RefreshLicenceUi()
+    {
+        ThemeChoices.Children.Clear();
+        _themeChoices.Clear();
+        BuildThemeChoices();
+        BuildLicencePanel();
+
+        // A Pro palette that is no longer entitled must not stay selected in the radio group.
+        var resolved = ThemeIds.Resolve(ViewModel.Theme, _licence.IsPro);
+        if (!string.Equals(resolved, ViewModel.Theme, StringComparison.Ordinal))
+        {
+            ViewModel.Theme = resolved;
+        }
     }
 
     private void OnThemeChecked(object sender, RoutedEventArgs e)

@@ -5,6 +5,7 @@ using Nectar.Data;
 using Nectar.Data.Entities;
 using Nectar.Hooks;
 using Nectar.Services;
+using Nectar.Services.Licence;
 using Nectar.Services.Calendar;
 using Nectar.Settings;
 using Microsoft.UI.Dispatching;
@@ -871,6 +872,12 @@ public sealed class WorkspaceViewModel : ObservableObject
         set
         {
             var next = AppTheme.Normalize(value);
+            if (!ThemeIds.IsEntitled(next, LicenceService.Current.IsPro))
+            {
+                // A free install cannot select a Pro palette, whatever the radio button sent.
+                return;
+            }
+
             if (string.Equals(_settings.Theme, next, StringComparison.Ordinal))
             {
                 return;
@@ -887,7 +894,21 @@ public sealed class WorkspaceViewModel : ObservableObject
     public string ThemeName => AppTheme.NameOf(_settings.Theme);
 
     /// <summary>Applies the saved look at startup, before the first window paints.</summary>
-    public void ApplySavedTheme() => AppTheme.Apply(_settings.Theme);
+    public void ApplySavedTheme()
+    {
+        var next = ThemeIds.Resolve(_settings.Theme, LicenceService.Current.IsPro);
+        if (!string.Equals(next, _settings.Theme, StringComparison.Ordinal))
+        {
+            // Saved while Pro, now expired or downgraded: settle on Paper and record it, so the
+            // settings window and the notch agree on what is actually painted.
+            _settings.Theme = next;
+            _settingsStore.TrySave(_settings);
+            OnPropertyChanged(nameof(Theme));
+            OnPropertyChanged(nameof(ThemeName));
+        }
+
+        AppTheme.Apply(next);
+    }
 
     public void MoveCard(int from, int to)
     {

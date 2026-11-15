@@ -15,6 +15,19 @@ public static class ThemeIds
 
     public static readonly string[] All = { Paper, Meadow, Sunset, Midnight };
 
+    /// <summary>The three palettes that ship free, forever.</summary>
+    public static readonly string[] Free = { Paper, Meadow, Sunset };
+
+    public static bool IsEntitled(string? id, bool isPro) =>
+        isPro || (id is not null && Array.Exists(Free, free => string.Equals(free, id, StringComparison.OrdinalIgnoreCase)));
+
+    /// <summary>A Pro palette on a free install resolves to Paper rather than repainting oddly.</summary>
+    public static string Resolve(string? id, bool isPro)
+    {
+        var known = Normalize(id);
+        return IsEntitled(known, isPro) ? known : Default;
+    }
+
     public static bool IsKnown(string? id) =>
         id is not null && Array.Exists(All, known => string.Equals(known, id, StringComparison.OrdinalIgnoreCase));
 

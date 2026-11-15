@@ -53,6 +53,10 @@ public partial class App : Application
             // The saved look is painted before the first frame, so the overlay never flashes Paper.
             _window.ViewModel.ApplySavedTheme();
 
+            // Refresh the licence in the background: Pro keeps its grace window if Dodo is
+            // unreachable, and the settings window repaints itself when the answer arrives.
+            _ = Nectar.Services.Licence.LicenceService.Current.RefreshAsync();
+
             // Activate once so the XAML/composition tree is live, then hide immediately:
             // Nectar must not present a primary window on launch.
             _window.Activate();
