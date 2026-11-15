@@ -30,3 +30,6 @@ TestResults/
 *.db-wal
 *.log
 .dotnet/
+
+# Working clone of the private Pro repository (b4b6u/nectar-pro).
+/pro/
