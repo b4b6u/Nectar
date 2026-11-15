@@ -55,7 +55,6 @@ Write-Output "building Nectar $version (MSIX, x64, self-contained)"
     -p:Configuration=Release `
     -p:Platform=x64 `
     -p:RuntimeIdentifier=win-x64 `
-    -p:NectarPro=false `
     -p:WindowsPackageType=MSIX `
     -p:AppxPackage=true `
     -p:GenerateAppxPackageOnBuild=true `

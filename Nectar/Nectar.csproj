@@ -4,17 +4,15 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
 
-    <!-- The Pro tree (Nectar/Pro/**) is proprietary and lives in the private repository
-         b4b6u/nectar-pro, which drops it back in and passes -p:NectarPro=true. This public
-         checkout has no Pro source at all, so the default build is the free tier. See
-         PRO-LICENCE.md. -->
-    <NectarPro Condition="'$(NectarPro)' == ''">false</NectarPro>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <RootNamespace>Nectar</RootNamespace>
     <AssemblyName>Nectar</AssemblyName>
     <Version>1.0.3</Version>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <DefineConstants Condition="'$(NectarPro)' == 'true'">$(DefineConstants);NECTAR_PRO</DefineConstants>
+    <!-- The Pro tree (Nectar/Pro/**) is proprietary and lives in the private repository
+         b4b6u/nectar-pro. Presence decides the tier, not a build property: this public checkout has
+         no Nectar/Pro, so it compiles as the free build. See PRO-LICENCE.md. -->
+    <DefineConstants Condition="Exists('$(MSBuildProjectDirectory)\Pro\Licence\ProEntitlementService.cs')">$(DefineConstants);NECTAR_PRO</DefineConstants>
     <ApplicationIcon>Assets\nectar.ico</ApplicationIcon>
 
     <!-- Unpackaged desktop app: no MSIX, no primary window, launched hidden. -->
@@ -39,12 +37,6 @@
     <DefaultLanguage>en-US</DefaultLanguage>
     <PublishReadyToRun>false</PublishReadyToRun>
   </PropertyGroup>
-
-  <!-- Kept out of the free build entirely: the files are still on disk for the Pro build but
-       are not compiled, so the shipped free binary contains none of their logic. -->
-  <ItemGroup Condition="'$(NectarPro)' != 'true'">
-    <Compile Remove="Pro\**\*.cs" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260921001" />
