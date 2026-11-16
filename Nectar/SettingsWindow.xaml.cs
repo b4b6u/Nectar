@@ -47,6 +47,7 @@ public sealed partial class SettingsWindow : Window
 
         BuildThemeChoices();
         BuildLicencePanel();
+        BuildCategoriesPanel();
         ViewModel.PropertyChanged += OnViewModelPropertyChanged;
         _licence.Changed += OnLicenceChanged;
         Closed += OnClosed;
@@ -156,6 +157,102 @@ public sealed partial class SettingsWindow : Window
     /// is the account - Dodo holds the customer and the billing portal, so there is nothing to sign
     /// into here and no password for this app to store.
     /// </summary>
+    /// <summary>
+    /// Categories sit beside the palettes because they are the same kind of thing: a way to make the
+    /// board read at a glance. Free stops at three; the line under the heading says so before anyone
+    /// hits the wall, rather than after.
+    /// </summary>
+    private void BuildCategoriesPanel()
+    {
+        CategoriesPanel.Children.Clear();
+
+        var muted = (Brush)Application.Current.Resources["NectarInkMutedBrush"];
+        var cardTitle = (Style)Application.Current.Resources["CardTitleTextStyle"];
+        var ghost = (Style)Application.Current.Resources["GhostActionButtonStyle"];
+
+        var heading = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 7 };
+        heading.Children.Add(new FontIcon
+        {
+            FontSize = 12,
+            Glyph = ((char)0xE8EC).ToString(),
+            Foreground = muted,
+        });
+        heading.Children.Add(new TextBlock { Text = "Categories", Style = cardTitle });
+        CategoriesPanel.Children.Add(heading);
+
+        CategoriesPanel.Children.Add(new TextBlock
+        {
+            Text = ViewModel.CategorySummary,
+            FontSize = 10,
+            TextWrapping = TextWrapping.Wrap,
+            Foreground = muted,
+        });
+
+        foreach (var category in ViewModel.Categories)
+        {
+            var row = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6 };
+            var box = new TextBox { Text = category.Name, FontSize = 11.5, Width = 176 };
+
+            // Rename on blur without rebuilding the panel, so the field does not vanish under the
+            // cursor mid-edit; only adding and removing rebuilds the list.
+            box.LostFocus += async (_, _) =>
+            {
+                if (!string.Equals(box.Text, category.Name, StringComparison.Ordinal))
+                {
+                    await ViewModel.RenameCategoryAsync(category, box.Text);
+                    box.Text = category.Name;
+                    RefreshCategorySummary();
+                }
+            };
+
+            var remove = new Button { Content = "Remove", Style = ghost };
+            remove.Click += async (_, _) =>
+            {
+                await ViewModel.DeleteCategoryAsync(category);
+                BuildCategoriesPanel();
+            };
+
+            row.Children.Add(box);
+            row.Children.Add(remove);
+            CategoriesPanel.Children.Add(row);
+        }
+
+        if (!ViewModel.CanAddCategory)
+        {
+            CategoriesPanel.Children.Add(new TextBlock
+            {
+                Text = "Nectar Pro lifts the limit.",
+                FontSize = 10,
+                TextWrapping = TextWrapping.Wrap,
+                Foreground = muted,
+            });
+            return;
+        }
+
+        var addRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6 };
+        var input = new TextBox { PlaceholderText = "New category", FontSize = 11.5, Width = 176 };
+        var add = new Button { Content = "Add", Style = ghost };
+        add.Click += async (_, _) =>
+        {
+            var created = await ViewModel.AddCategoryAsync(input.Text);
+            if (created is not null)
+            {
+                BuildCategoriesPanel();
+            }
+        };
+        addRow.Children.Add(input);
+        addRow.Children.Add(add);
+        CategoriesPanel.Children.Add(addRow);
+    }
+
+    private void RefreshCategorySummary()
+    {
+        if (CategoriesPanel.Children.Count > 1 && CategoriesPanel.Children[1] is TextBlock summary)
+        {
+            summary.Text = ViewModel.CategorySummary;
+        }
+    }
+
     private void BuildLicencePanel()
     {
         LicencePanel.Children.Clear();
@@ -257,6 +354,7 @@ public sealed partial class SettingsWindow : Window
         _themeChoices.Clear();
         BuildThemeChoices();
         BuildLicencePanel();
+        BuildCategoriesPanel();
 
         // A Pro palette that is no longer entitled must not stay selected in the radio group.
         var resolved = ThemeIds.Resolve(ViewModel.Theme, _licence.IsPro);

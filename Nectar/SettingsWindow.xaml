@@ -295,6 +295,9 @@
 
                         <!-- Nectar Pro: the key is the account, so activation lives here. -->
                         <StackPanel x:Name="LicencePanel" Spacing="6" Margin="0,4,0,0" />
+
+                        <!-- Categories: three free, unlimited with a licence. -->
+                        <StackPanel x:Name="CategoriesPanel" Spacing="6" Margin="0,4,0,0" />
                     </StackPanel>
                 </Border>
 

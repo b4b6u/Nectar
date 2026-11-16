@@ -76,13 +76,38 @@ public sealed class TaskRow : ObservableObject
                 return "Done";
             }
 
-            return Model.Deadline is { } deadline
+            var meta = Model.Deadline is { } deadline
                 ? $"Due {deadline:ddd d MMM} · {deadline:HH:mm}"
                 : $"Added {Model.CreatedAt:ddd d MMM}";
+
+            // The category rides along on the same line, so filing a task never makes the row taller.
+            return CategoryName is null ? meta : $"{meta} · {CategoryName}";
         }
     }
 
     public Visibility MetaVisibility => Visibility.Visible;
+
+    /// <summary>The category chip's label, or null when the task is unfiled.</summary>
+    public string? CategoryName { get; private set; }
+
+    /// <summary>Index into the chip tones; -1 when unfiled.</summary>
+    public int CategoryColour { get; private set; } = -1;
+
+    public string CategoryBadge => CategoryName ?? string.Empty;
+
+    public Visibility CategoryVisibility =>
+        CategoryName is null ? Visibility.Collapsed : Visibility.Visible;
+
+    public void ApplyCategory(Guid? id, string? name, int colour)
+    {
+        Model.CategoryId = id;
+        CategoryName = name;
+        CategoryColour = colour;
+        OnPropertyChanged(nameof(CategoryName));
+        OnPropertyChanged(nameof(CategoryBadge));
+        OnPropertyChanged(nameof(CategoryVisibility));
+        OnPropertyChanged(nameof(MetaText));
+    }
 
     public Brush DialFill => _isCompleted ? DoneBrush : ClearBrush;
 

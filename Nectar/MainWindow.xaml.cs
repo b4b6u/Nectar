@@ -780,6 +780,89 @@ public sealed partial class MainWindow : Window, IDisposable
 
     private void OnSettingsWindowClosed(object sender, WindowEventArgs args) => _settingsWindow = null;
 
+    /// <summary>
+    /// The tag on a task row: file it under a category, unfiled it, or make a new one if the tier
+    /// still has room. A free install stops at three and the menu says so rather than hiding the entry.
+    /// </summary>
+    private void OnTaskCategoryClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button { DataContext: TaskRow row } button)
+        {
+            return;
+        }
+
+        var flyout = new MenuFlyout();
+
+        var unfiled = new MenuFlyoutItem { Text = "No category" };
+        unfiled.Click += async (_, _) => await ViewModel.AssignCategoryAsync(row, null);
+        flyout.Items.Add(unfiled);
+
+        if (ViewModel.Categories.Count > 0)
+        {
+            flyout.Items.Add(new MenuFlyoutSeparator());
+        }
+
+        foreach (var category in ViewModel.Categories)
+        {
+            var choice = category;
+            var filed = row.Model.CategoryId == choice.Id;
+
+            // MenuFlyoutItem has no check state, so the filed one carries a mark in its text.
+            var item = new MenuFlyoutItem
+            {
+                Text = filed ? "\u2713 " + choice.Name : choice.Name,
+            };
+
+            item.Click += async (_, _) => await ViewModel.AssignCategoryAsync(row, choice);
+            flyout.Items.Add(item);
+        }
+
+        flyout.Items.Add(new MenuFlyoutSeparator());
+
+        if (ViewModel.CanAddCategory)
+        {
+            var create = new MenuFlyoutItem { Text = "New category…" };
+            create.Click += async (_, _) => await PromptNewCategoryAsync(row, button);
+            flyout.Items.Add(create);
+        }
+        else
+        {
+            flyout.Items.Add(new MenuFlyoutItem
+            {
+                Text = $"Free stops at {ViewModel.CategoryLimit} categories",
+                IsEnabled = false,
+            });
+        }
+
+        flyout.ShowAt(button);
+    }
+
+    private async Task PromptNewCategoryAsync(TaskRow row, FrameworkElement anchor)
+    {
+        var input = new TextBox { PlaceholderText = "Category name", Width = 260 };
+
+        var dialog = new ContentDialog
+        {
+            Title = "New category",
+            Content = input,
+            PrimaryButtonText = "Add",
+            CloseButtonText = "Cancel",
+            DefaultButton = ContentDialogButton.Primary,
+            XamlRoot = anchor.XamlRoot,
+        };
+
+        if (await dialog.ShowAsync() != ContentDialogResult.Primary)
+        {
+            return;
+        }
+
+        var created = await ViewModel.AddCategoryAsync(input.Text);
+        if (created is not null)
+        {
+            await ViewModel.AssignCategoryAsync(row, created);
+        }
+    }
+
     /// <summary>Bell on an event row: pick a lead time, or drop an existing reminder.</summary>
     private void OnEventReminderClick(object sender, RoutedEventArgs e)
     {

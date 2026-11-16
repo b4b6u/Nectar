@@ -7,6 +7,14 @@ Downloads live at <https://github.com/b4b6u/Nectar/releases>.
 
 ### Added
 
+- **Categories, three of them free.** A task can now be filed under a category: the tag on any task
+  row opens a menu with "No category", every category you have, and "New category…". The name rides
+  along on the row's meta line. Categories are made, renamed and removed in Settings, and the free
+  build stops at three - the panel says so before you hit the wall, and the row menu says so instead
+  of hiding the entry. A key lifts the limit entirely.
+- **Existing databases upgrade in place.** The category table and the task column are created on
+  the next launch without touching a single task.
+
 - **Nectar Pro, sold through Dodo Payments.** A licence key is the account: Dodo holds the customer,
   the subscription and the billing portal, and Nectar holds a key, an activation id and the last
   time it checked in. Activation and validation use Dodo's public license endpoints, so the app

@@ -81,6 +81,28 @@ internal sealed class WorkspaceRepository
                     cancellationToken).ConfigureAwait(false);
             }
 
+            // Categories arrived after the first release, so they are created the same way the other
+            // late tables were: IF NOT EXISTS on a fresh database is a no-op, and an older database
+            // gains the table and the column without losing a single task.
+            if (!await TaskColumnExistsAsync(db, "CategoryId", cancellationToken).ConfigureAwait(false))
+            {
+                await db.Database.ExecuteSqlRawAsync(
+                    "ALTER TABLE Tasks ADD COLUMN CategoryId TEXT NULL",
+                    cancellationToken).ConfigureAwait(false);
+            }
+
+            await db.Database.ExecuteSqlRawAsync(
+                "CREATE TABLE IF NOT EXISTS Categories (" +
+                "Id TEXT NOT NULL CONSTRAINT PK_Categories PRIMARY KEY, " +
+                "Name TEXT NOT NULL, " +
+                "Colour INTEGER NOT NULL, " +
+                "CreatedAt TEXT NOT NULL)",
+                cancellationToken).ConfigureAwait(false);
+
+            await db.Database.ExecuteSqlRawAsync(
+                "CREATE INDEX IF NOT EXISTS IX_Tasks_CategoryId ON Tasks (CategoryId)",
+                cancellationToken).ConfigureAwait(false);
+
             var noteExists = await db.Notes
                 .AnyAsync(n => n.Id == EphemeralNote.SingletonId, cancellationToken)
                 .ConfigureAwait(false);
@@ -275,6 +297,104 @@ internal sealed class WorkspaceRepository
     }
 
     /// <summary>True when <c>Tasks</c> already has the column (SQLite has no IF NOT EXISTS here).</summary>
+    internal async Task<IReadOnlyList<Category>> LoadCategoriesAsync(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await using var db = new NectarDbContext(_options);
+            return await db.Categories
+                .AsNoTracking()
+                .OrderBy(c => c.CreatedAt)
+                .ToListAsync(cancellationToken)
+                .ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            throw new WorkspaceDataException("Categories could not be loaded.", ex);
+        }
+    }
+
+    internal async Task AddCategoryAsync(Category category, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await using var db = new NectarDbContext(_options);
+            db.Categories.Add(category);
+            await db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            throw new WorkspaceDataException("The category could not be saved.", ex);
+        }
+    }
+
+    internal async Task UpdateCategoryAsync(Category category, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await using var db = new NectarDbContext(_options);
+            db.Categories.Update(category);
+            await db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            throw new WorkspaceDataException("The category could not be renamed.", ex);
+        }
+    }
+
+    /// <summary>
+    /// Deletes a category and unfiles its tasks in one save. The tasks are the user's work; the
+    /// category is a label, so the label goes and the work stays.
+    /// </summary>
+    internal async Task DeleteCategoryAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await using var db = new NectarDbContext(_options);
+            var filed = await db.Tasks
+                .Where(t => t.CategoryId == id)
+                .ToListAsync(cancellationToken)
+                .ConfigureAwait(false);
+
+            foreach (var task in filed)
+            {
+                task.CategoryId = null;
+            }
+
+            var category = await db.Categories.FindAsync(new object?[] { id }, cancellationToken).ConfigureAwait(false);
+            if (category is not null)
+            {
+                db.Categories.Remove(category);
+            }
+
+            await db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            throw new WorkspaceDataException("The category could not be removed.", ex);
+        }
+    }
+
+    internal async Task SetTaskCategoryAsync(Guid taskId, Guid? categoryId, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await using var db = new NectarDbContext(_options);
+            var task = await db.Tasks.FindAsync(new object?[] { taskId }, cancellationToken).ConfigureAwait(false);
+            if (task is null)
+            {
+                return;
+            }
+
+            task.CategoryId = categoryId;
+            await db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            throw new WorkspaceDataException("The task's category could not be changed.", ex);
+        }
+    }
+
     private static async Task<bool> TaskColumnExistsAsync(
         NectarDbContext db,
         string column,

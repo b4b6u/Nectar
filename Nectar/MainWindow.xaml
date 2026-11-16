@@ -490,20 +490,36 @@
                                                             Visibility="{x:Bind MetaVisibility, Mode=OneWay}" />
                                                     </StackPanel>
 
-                                                    <Button
+                                                    <StackPanel
                                                         Grid.Column="2"
-                                                        Width="20"
-                                                        Height="20"
-                                                        Padding="0"
                                                         VerticalAlignment="Top"
-                                                        Background="Transparent"
-                                                        BorderThickness="0"
-                                                        Click="OnDeleteTaskClick"
-                                                        CornerRadius="10"
-                                                        Opacity="0.35"
-                                                        ToolTipService.ToolTip="Delete task">
-                                                        <FontIcon FontSize="9" Foreground="{StaticResource NectarInkBrush}" Glyph="&#xE711;" />
-                                                    </Button>
+                                                        Orientation="Horizontal"
+                                                        Spacing="2">
+                                                        <Button
+                                                            Width="20"
+                                                            Height="20"
+                                                            Padding="0"
+                                                            Background="Transparent"
+                                                            BorderThickness="0"
+                                                            Click="OnTaskCategoryClick"
+                                                            CornerRadius="10"
+                                                            Opacity="0.35"
+                                                            ToolTipService.ToolTip="File under a category">
+                                                            <FontIcon FontSize="9" Foreground="{StaticResource NectarInkBrush}" Glyph="&#xE8EC;" />
+                                                        </Button>
+                                                        <Button
+                                                            Width="20"
+                                                            Height="20"
+                                                            Padding="0"
+                                                            Background="Transparent"
+                                                            BorderThickness="0"
+                                                            Click="OnDeleteTaskClick"
+                                                            CornerRadius="10"
+                                                            Opacity="0.35"
+                                                            ToolTipService.ToolTip="Delete task">
+                                                            <FontIcon FontSize="9" Foreground="{StaticResource NectarInkBrush}" Glyph="&#xE711;" />
+                                                        </Button>
+                                                    </StackPanel>
                                                 </Grid>
                                             </Border>
                                             <Rectangle

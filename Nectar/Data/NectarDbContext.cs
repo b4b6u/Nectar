@@ -20,6 +20,8 @@ internal sealed class NectarDbContext : DbContext
 
     public DbSet<FocusSession> FocusSessions => Set<FocusSession>();
 
+    public DbSet<Category> Categories => Set<Category>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -34,6 +36,15 @@ internal sealed class NectarDbContext : DbContext
         task.HasIndex(t => t.Deadline);
         task.HasIndex(t => t.CreatedAt);
         task.HasIndex(t => t.CompletedAt);
+        task.HasIndex(t => t.CategoryId);
+
+        var category = modelBuilder.Entity<Category>();
+        category.ToTable("Categories");
+        category.HasKey(c => c.Id);
+        category.Property(c => c.Name).IsRequired().HasMaxLength(64);
+        category.Property(c => c.Colour).IsRequired();
+        category.Property(c => c.CreatedAt).IsRequired();
+        category.HasIndex(c => c.CreatedAt);
 
         var note = modelBuilder.Entity<EphemeralNote>();
         note.ToTable("Notes");

@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 using System.Windows.Input;
 using Nectar.Data;
 using Nectar.Data.Entities;
+using Nectar.Services.Categories;
 using Nectar.Hooks;
 using Nectar.Services;
 using Nectar.Services.Entitlement;
@@ -58,6 +59,9 @@ public sealed class WorkspaceViewModel : ObservableObject
     }
 
     public ObservableCollection<TaskRow> Tasks { get; } = new();
+
+    /// <summary>Every category the user has made, oldest first. Free stops at three; Pro does not.</summary>
+    public ObservableCollection<Category> Categories { get; } = new();
 
     public ObservableCollection<CalendarEventRow> Agenda { get; } = new();
 
@@ -208,6 +212,15 @@ public sealed class WorkspaceViewModel : ObservableObject
             }
 
             NoteText = await _repository.LoadNoteAsync();
+
+            Categories.Clear();
+            foreach (var category in await _repository.LoadCategoriesAsync())
+            {
+                Categories.Add(category);
+            }
+
+            ApplyCategoriesToRows();
+            RaiseCategoryState();
         }
         catch (WorkspaceDataException ex)
         {
@@ -339,6 +352,123 @@ public sealed class WorkspaceViewModel : ObservableObject
     private void OnNoteSaveTick(DispatcherQueueTimer sender, object args)
     {
         _ = SaveNoteNowAsync();
+    }
+
+    private void ApplyCategoriesToRows()
+    {
+        var byId = Categories.ToDictionary(category => category.Id);
+        foreach (var row in Tasks)
+        {
+            if (row.Model.CategoryId is { } id && byId.TryGetValue(id, out var category))
+            {
+                row.ApplyCategory(id, category.Name, category.Colour);
+            }
+            else
+            {
+                row.ApplyCategory(null, null, -1);
+            }
+        }
+    }
+
+    /// <summary>Three free, unlimited with a licence. The number lives in one place on purpose.</summary>
+    public int CategoryLimit => CategoryRules.LimitFor(Entitlements.Current.IsPro);
+
+    public bool CanAddCategory => CategoryRules.CanAdd(Categories.Count, Entitlements.Current.IsPro);
+
+    public string CategorySummary => CategoryRules.LimitMessage(Categories.Count, Entitlements.Current.IsPro);
+
+    /// <summary>
+    /// Adds a category unless the tier's ceiling is reached or the name is already used. Returns null
+    /// when it refused, so callers can tell "nothing happened" from "saved".
+    /// </summary>
+    public async Task<Category?> AddCategoryAsync(string name)
+    {
+        var trimmed = CategoryRules.NormalizeName(name);
+        if (trimmed.Length == 0 || !CanAddCategory)
+        {
+            return null;
+        }
+
+        if (Categories.Any(category => string.Equals(category.Name, trimmed, StringComparison.OrdinalIgnoreCase)))
+        {
+            return null;
+        }
+
+        var created = new Category { Name = trimmed, Colour = Categories.Count };
+
+        try
+        {
+            await _repository.AddCategoryAsync(created);
+            Categories.Add(created);
+            RaiseCategoryState();
+            return created;
+        }
+        catch (WorkspaceDataException ex)
+        {
+            Banner = ex.Message;
+            return null;
+        }
+    }
+
+    public async Task RenameCategoryAsync(Category category, string name)
+    {
+        var trimmed = CategoryRules.NormalizeName(name);
+        if (trimmed.Length == 0 || string.Equals(trimmed, category.Name, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        var previous = category.Name;
+        category.Name = trimmed;
+
+        try
+        {
+            await _repository.UpdateCategoryAsync(category);
+            ApplyCategoriesToRows();
+            RaiseCategoryState();
+        }
+        catch (WorkspaceDataException ex)
+        {
+            category.Name = previous;
+            Banner = ex.Message;
+        }
+    }
+
+    /// <summary>Removes the label; the tasks filed under it are unfiled, never deleted.</summary>
+    public async Task DeleteCategoryAsync(Category category)
+    {
+        try
+        {
+            await _repository.DeleteCategoryAsync(category.Id);
+            Categories.Remove(category);
+            ApplyCategoriesToRows();
+            RaiseCategoryState();
+        }
+        catch (WorkspaceDataException ex)
+        {
+            Banner = ex.Message;
+        }
+    }
+
+    public async Task AssignCategoryAsync(TaskRow row, Category? category)
+    {
+        try
+        {
+            await _repository.SetTaskCategoryAsync(row.Id, category?.Id);
+            row.ApplyCategory(category?.Id, category?.Name, category?.Colour ?? -1);
+        }
+        catch (WorkspaceDataException ex)
+        {
+            Banner = ex.Message;
+        }
+    }
+
+    private void RaiseCategoryState()
+    {
+        OnPropertyChanged(nameof(Categories));
+        OnPropertyChanged(nameof(CanAddCategory));
+        OnPropertyChanged(nameof(CategorySummary));
+        OnPropertyChanged(nameof(CategoryLimit));
     }
 
     private TaskRow Attach(TaskRow row)

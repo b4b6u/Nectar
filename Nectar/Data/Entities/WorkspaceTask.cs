@@ -15,4 +15,7 @@ public sealed class WorkspaceTask
     public DateTime? CompletedAt { get; set; }
 
     public DateTime? Deadline { get; set; }
+
+    /// <summary>Which category the task is filed under. Null means unfiled, which is not an error.</summary>
+    public Guid? CategoryId { get; set; }
 }
